@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">0dp</dimen>
+    <dimen name="activity_vertical_margin">0dp</dimen>
+    <dimen name="logo_margin">48dp</dimen>
+    <dimen name="scroll_view">50dp</dimen>
+    <dimen name="login_text_margin_top">16dp</dimen>
+    <dimen name="login_text_size">32sp</dimen>
+    <dimen name="login_input_field">48dp</dimen>
+    <dimen name="login_input_field_padding_lft_rgt">32dp</dimen>
+    <dimen name="login_input_field_padding_bottom">18dp</dimen>
+    <dimen name="login_text">18sp</dimen>
+    <dimen name="navigation_drawer_width">240dp</dimen>
+
+</resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Evernote</string>
+    <string name="evernote">Evernote BMSTU</string>
+    <string name="title_activity_login">Login</string>
+    <string name="sync">Syncronization</string>
+    <string name="sync_settings_summary">Sync</string>
+    <string name="general_settings">General settings</string>
+    <string name="title_activity_splash_screeen">SplashScreeen</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="logo_content_description">logo</string>
+    <string name="search">Search</string>
+    <string name="menu_sort">Сортировка…</string>
+    <string name="menu_sync">Синхронизировать</string>
+    <string name="menu_options">Настройки</string>
+    <string name="menu_add_to_home_screen">Добавить на домашний экран</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_example">Example action</string>
+
+</resources>

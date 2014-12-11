@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="backgroundLogin">#2dbe60</color>
+    <color name="singinButton">#76c196</color>
+    <color name="login_remember_color">#FFFFFF</color>
+    <color name="login_text">#005e37</color>
+    <color name="login_hint">#1a7e4d</color>
+</resources>
