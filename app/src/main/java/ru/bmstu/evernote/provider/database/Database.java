@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import ru.bmstu.evernote.provider.database.tables.Notebooks;
+import ru.bmstu.evernote.provider.database.tables.Notes;
 
 /**
  * Created by Ivan on 11.12.2014.
@@ -20,11 +21,12 @@ public class Database extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(Notebooks.SQL_CREATE);
+        sqLiteDatabase.execSQL(Notes.SQL_CREATE);
     }
-
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
         sqLiteDatabase.execSQL(Notebooks.SQL_DROP);
+        sqLiteDatabase.execSQL(Notes.SQL_DROP);
         onCreate(sqLiteDatabase);
     }
 }

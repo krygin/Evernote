@@ -12,6 +12,7 @@ import android.util.Log;
 
 import ru.bmstu.evernote.provider.database.Database;
 import ru.bmstu.evernote.provider.database.tables.Notebooks;
+import ru.bmstu.evernote.provider.database.tables.Notes;
 
 public class EvernoteContentProvider extends ContentProvider {
     private static final String LOGTAG = EvernoteContentProvider.class.getSimpleName();
@@ -20,6 +21,7 @@ public class EvernoteContentProvider extends ContentProvider {
     public static final Uri AUTHORITY_URI = Uri.parse("content://" + AUTHORITY);
 
     public static final Uri NOTEBOOKS_URI = Uri.withAppendedPath(AUTHORITY_URI, Notebooks.TABLE_PATH);
+    public static final Uri NOTES_URI = Uri.withAppendedPath(AUTHORITY_URI, Notes.TABLE_PATH);
 
     private static final UriMatcher URI_MATCHER;
 
@@ -27,11 +29,15 @@ public class EvernoteContentProvider extends ContentProvider {
 
     private static final int NOTEBOOKS = 0;
     private static final int NOTEBOOKS_ID = 1;
+    private static final int NOTES = 2;
+    private static final int NOTES_ID = 3;
 
     static {
         URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
         URI_MATCHER.addURI(AUTHORITY, Notebooks.TABLE_PATH, NOTEBOOKS);
         URI_MATCHER.addURI(AUTHORITY, Notebooks.TABLE_PATH + "/#", NOTEBOOKS_ID);
+        URI_MATCHER.addURI(AUTHORITY, Notes.TABLE_PATH, NOTES);
+        URI_MATCHER.addURI(AUTHORITY, Notes.TABLE_PATH + "/#", NOTES_ID);
     }
 
     @Override
@@ -44,9 +50,13 @@ public class EvernoteContentProvider extends ContentProvider {
     public String getType(Uri uri) {
         switch (URI_MATCHER.match(uri)){
             case NOTEBOOKS:
-                return Notebooks.CONTENT_ITEM_TYPE;
-            case NOTEBOOKS_ID:
                 return Notebooks.CONTENT_TYPE;
+            case NOTEBOOKS_ID:
+                return Notebooks.CONTENT_ITEM_TYPE;
+            case NOTES:
+                return Notes.CONTENT_TYPE;
+            case NOTES_ID:
+                return Notes.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
@@ -62,6 +72,12 @@ public class EvernoteContentProvider extends ContentProvider {
                 case NOTEBOOKS_ID:
                     final long notebookId = dbConnection.insertOrThrow(Notebooks.TABLE_NAME, null, values);
                     result = ContentUris.withAppendedId(NOTEBOOKS_URI, notebookId);
+                    getContext().getContentResolver().notifyChange(result, null);
+                    break;
+                case NOTES:
+                case NOTES_ID:
+                    final long noteId = dbConnection.insertOrThrow(Notes.TABLE_NAME, null, values);
+                    result = ContentUris.withAppendedId(NOTES_URI, noteId);
                     getContext().getContentResolver().notifyChange(result, null);
                     break;
                 default:
@@ -84,7 +100,15 @@ public class EvernoteContentProvider extends ContentProvider {
                     builder.setTables(Notebooks.TABLE_NAME);
                     break;
                 case NOTEBOOKS_ID:
+                    builder.setTables(Notebooks.TABLE_NAME);
                     builder.appendWhere(Notebooks._ID + "=" + uri.getLastPathSegment());
+                    break;
+                case NOTES:
+                    builder.setTables(Notes.TABLE_NAME);
+                    break;
+                case NOTES_ID:
+                    builder.setTables(Notes.TABLE_NAME);
+                    builder.appendWhere(Notes._ID + "=" + uri.getLastPathSegment());
                     break;
                 default:
                     throw new IllegalArgumentException("Unsupported URI: " + uri);
@@ -92,7 +116,6 @@ public class EvernoteContentProvider extends ContentProvider {
         } catch (Exception e) {
             Log.e(LOGTAG, "Query exception: " + e.toString());
         }
-
         Cursor cursor = builder.query(dbConnection, projection, selection, selectionArgs, null, null, sortOrder);
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;

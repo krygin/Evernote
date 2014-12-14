@@ -11,25 +11,31 @@ public interface Notebooks extends BaseColumns {
 
     String NAME = "name";
     String GUID = "guid";
-    String UPDATED = "updated";
     String CREATED = "created";
+    String UPDATED = "updated";
     String USN = "usn";
 
 
     String TABLE_PATH = "notebooks";
 
-    String[] ALL_COLUMNS = new String[]{_ID, NAME, GUID, UPDATED, CREATED, USN};
-    String SQL_CREATE = "CREATE TABLE " + TABLE_NAME + " ( " + _ID
-			+ " INTEGER PRIMARY KEY AUTOINCREMENT" + "," + NAME + " TEXT UNIQUE" + ","
-			+ GUID + " TEXT UNIQUE" + "," + UPDATED + " INTEGER" + "," + CREATED
-			+ " INTEGER" + "," + USN + " INTEGER" + " )";
+    String[] ALL_COLUMNS = new String[]{_ID, NAME, GUID, CREATED, UPDATED, USN};
+    String SQL_CREATE = "CREATE TABLE " + TABLE_NAME + " ( " +
+            _ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
+            NAME + " TEXT UNIQUE NOT NULL" + "," +
+            GUID + " TEXT UNIQUE" + "," +
+            UPDATED + " INTEGER NOT NULL" + "," +
+            CREATED + " INTEGER NOT NULL" + "," +
+            USN + " INTEGER" + " )";
 
-    String SQL_INSERT = "INSERT INTO " + TABLE_NAME + " (" + NAME + "," + GUID
-            + "," + UPDATED + "," + CREATED + "," + USN
-            + ") VALUES ( ?, ?, ?, ?, ? )";
+    String SQL_INSERT = "INSERT INTO " + TABLE_NAME + " (" +
+            NAME + "," +
+            GUID + "," +
+            CREATED + "," +
+            UPDATED + "," +
+            USN +
+            ") VALUES ( ?, ?, ?, ?, ? )";
 
     String[] DEFAULT_PROJECTION = new String[]{_ID, NAME, GUID, UPDATED, CREATED, USN};
-
 
     String SQL_DROP = "DROP TABLE IF EXISTS " + TABLE_NAME;
 

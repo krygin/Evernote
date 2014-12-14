@@ -5,10 +5,13 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +24,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import ru.bmstu.evernote.account.EvernoteAuthenticator;
 import ru.bmstu.evernote.provider.database.tables.Notebooks;
 
 
@@ -37,12 +41,22 @@ public class MainActivity extends Activity
      */
     private CharSequence mTitle;
 
+    private ContentProviderHelperService mService;
 
-    private static String[] from = new String[]{Notebooks.NAME, Notebooks.GUID};
-    private static int[] to = new int[] {android.R.id.text1, android.R.id.text2};
-    SimpleCursorAdapter adapter;
-    ListView listView;
-    ContentProviderHelper helper;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            ContentProviderHelperService.ContentProviderHelperBinder binder =
+                    (ContentProviderHelperService.ContentProviderHelperBinder) iBinder;
+            mService = binder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mService = null;
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +71,21 @@ public class MainActivity extends Activity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+    }
 
-        adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, null, from, to, 0);
-        //listView = (ListView)findViewById(R.id.lv);
-        //listView.setAdapter(adapter);
-        //helper = new ContentProviderHelper(MainActivity.this, adapter);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, ContentProviderHelperService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mService != null) {
+            unbindService(mConnection);
+        }
     }
 
     @Override

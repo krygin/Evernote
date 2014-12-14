@@ -16,6 +16,20 @@
         <activity
             android:name=".account.LoginActivity"
             android:label="@string/title_activity_login" />
+        <activity
+            android:name=".activities.SplashScreen"
+            android:label="@string/title_activity_splash_screen" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main" >
+        </activity>
+
         <service
             android:name=".account.EvernoteAuthenticatorService"
             android:exported="false" >
@@ -28,12 +42,8 @@
                 android:resource="@xml/evernote_authenticator" />
         </service>
         <service
-            android:name=".EvernoteIntentService"
-            android:exported="false" >
-        </service>
-        <service
             android:name=".account.SyncService"
-            android:exported="true" >
+            android:exported="false" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -43,27 +53,17 @@
                 android:resource="@xml/sync_adapter" />
         </service>
 
-        <activity
-            android:name=".activities.SplashScreen"
-            android:label="@string/title_activity_splash_screeen" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
         <provider
             android:name=".provider.EvernoteContentProvider"
             android:authorities="ru.bmstu.evernote.provider"
             android:exported="false"
             android:syncable="true" >
         </provider>
-
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/title_activity_main" >
-        </activity>
+        <service
+            android:name=".ContentProviderHelperService"
+            android:enabled="false"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>
