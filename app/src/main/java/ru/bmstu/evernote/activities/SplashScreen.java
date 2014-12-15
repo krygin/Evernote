@@ -4,9 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 
-import ru.bmstu.evernote.MainActivity;
-import ru.bmstu.evernote.account.EvernoteSession;
 import ru.bmstu.evernote.R;
+import ru.bmstu.evernote.account.EvernoteSession;
 
 
 public class SplashScreen extends Activity {

@@ -36,6 +36,7 @@ public interface Notebooks extends BaseColumns {
             ") VALUES ( ?, ?, ?, ?, ? )";
 
     String[] DEFAULT_PROJECTION = new String[]{_ID, NAME, GUID, UPDATED, CREATED, USN};
+    String[] TEST_PROJECTION = new String[]{_ID, NAME, GUID, CREATED};
 
     String SQL_DROP = "DROP TABLE IF EXISTS " + TABLE_NAME;
 

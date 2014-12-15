@@ -18,7 +18,6 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.Locale;
 
-import ru.bmstu.evernote.MainActivity;
 import ru.bmstu.evernote.activities.SplashScreen;
 import ru.bmstu.evernote.data.ClientFactory;
 
@@ -132,7 +131,7 @@ public class EvernoteSession {
                     public void run(AccountManagerFuture<Bundle> future) {
                         try {
                             future.getResult();
-                            MainActivity.startMainActivity(mActivity);
+                            //MainActivity.startMainActivity(mActivity);
                         } catch (OperationCanceledException | IOException | AuthenticatorException e) {
                             (mActivity).finish();
                         }
