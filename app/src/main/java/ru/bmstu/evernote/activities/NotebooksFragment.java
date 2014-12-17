@@ -24,8 +24,8 @@ import ru.bmstu.evernote.provider.database.tables.Notebooks;
 public class NotebooksFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private CursorAdapter mAdapter;
 
-    private final String[] from = new String[]{Notebooks.NAME, Notebooks.GUID};
-    private final int[] to = new int[]{android.R.id.text1, android.R.id.text2};
+    private final String[] from = new String[]{Notebooks._ID, Notebooks.NAME, Notebooks.GUID, Notebooks.CREATED, Notebooks.UPDATED, Notebooks.USN};
+    private final int[] to = new int[]{R.id.id, R.id.name, R.id.guid, R.id.created, R.id.updated, R.id.usn };
 
     public NotebooksFragment() {
         // Required empty public constructor
@@ -35,15 +35,13 @@ public class NotebooksFragment extends ListFragment implements LoaderManager.Loa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getLoaderManager().initLoader(0, null, this);
-        mAdapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_list_item_2, null, from, to, 0);
+        mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.notebook_item, null, from, to, 0);
         setListAdapter(mAdapter);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        getLoaderManager().initLoader(0, null, this);
         return inflater.inflate(R.layout.fragment_notebooks, null, false);
     }
 
@@ -60,11 +58,11 @@ public class NotebooksFragment extends ListFragment implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        mAdapter.changeCursor(cursor);
+        mAdapter.swapCursor(cursor);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        mAdapter.changeCursor(null);
+        mAdapter.swapCursor(null);
     }
 }

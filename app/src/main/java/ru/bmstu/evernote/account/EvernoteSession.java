@@ -2,23 +2,15 @@ package ru.bmstu.evernote.account;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import java.io.IOException;
 import java.util.Locale;
 
-import ru.bmstu.evernote.activities.SplashScreen;
 import ru.bmstu.evernote.data.ClientFactory;
 
 /**
@@ -29,28 +21,23 @@ public class EvernoteSession {
     public static final String HOST_PRODUCTION = "https://www.evernote.com";
     private static final String LOGTAG = EvernoteSession.class.getSimpleName();
     private static EvernoteSession sInstance = null;
+    private final Context mContext;
     private EvernoteService mEvernoteService;
     private ClientFactory mClientFactory;
     private String mNoteStoreUrl;
     private String mWebApiUrlPrefix;
 
-    private Activity mActivity;
 
-    private EvernoteSession(Activity activity, EvernoteService evernoteService) {
+    private EvernoteSession(Context context, EvernoteService evernoteService) {
         mEvernoteService = evernoteService;
-        mActivity = activity;
-        mEvernoteService = evernoteService;
-        mClientFactory = new ClientFactory(generateUserAgentString(activity), activity.getFilesDir());
-        AccountManager accountManager = AccountManager.get(activity);
+        mContext = context;
+        mClientFactory = new ClientFactory(generateUserAgentString(mContext), mContext.getFilesDir());
+        AccountManager accountManager = AccountManager.get(mContext);
         Account[] accounts = accountManager.getAccountsByType(EvernoteAccount.TYPE);
         if (accounts.length != 0) {
             Account account = accounts[0];
             this.mNoteStoreUrl = accountManager.getUserData(account, EvernoteAccount.EXTRA_NOTE_STORE_URL);
             this.mWebApiUrlPrefix = accountManager.getUserData(account, EvernoteAccount.EXTRA_WEB_API_URL_PREFIX);
-            ((SplashScreen)mActivity).setDataLoaded(true);
-            ((SplashScreen)mActivity).startMainActivity();
-        } else {
-            addNewAccount(accountManager);
         }
     }
 
@@ -58,9 +45,8 @@ public class EvernoteSession {
         return sInstance;
     }
 
-    public static EvernoteSession initInstance(Activity activity,
-                                               EvernoteService evernoteService) {
-        return sInstance = new EvernoteSession(activity, evernoteService);
+    public static EvernoteSession initInstance(Context ctx, EvernoteService evernoteService) {
+        return sInstance = new EvernoteSession(ctx, evernoteService);
     }
 
     public ClientFactory getClientFactory() {
@@ -99,7 +85,6 @@ public class EvernoteSession {
 
     private String generateUserAgentString(Context ctx) {
         // com.evernote.sample Android/216817 (en); Android/4.0.3; Xoom/15;"
-
         String packageName = null;
         int packageVersion = 0;
         try {
@@ -122,21 +107,5 @@ public class EvernoteSession {
         userAgent +=
                 Build.MODEL + "/" + Build.VERSION.SDK_INT + ";";
         return userAgent;
-    }
-
-    private void addNewAccount(AccountManager am) {
-        am.addAccount(EvernoteAccount.TYPE, EvernoteAccount.TOKEN_FULL_ACCESS, null, null, mActivity,
-                new AccountManagerCallback<Bundle>() {
-                    @Override
-                    public void run(AccountManagerFuture<Bundle> future) {
-                        try {
-                            future.getResult();
-                            //MainActivity.startMainActivity(mActivity);
-                        } catch (OperationCanceledException | IOException | AuthenticatorException e) {
-                            (mActivity).finish();
-                        }
-                    }
-                }, null
-        );
     }
 }

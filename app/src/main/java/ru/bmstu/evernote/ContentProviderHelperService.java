@@ -1,8 +1,8 @@
 package ru.bmstu.evernote;
 
 import android.app.Service;
+import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Binder;
@@ -50,5 +50,14 @@ public class ContentProviderHelperService extends Service {
         contentValues.put(Notes.UPDATED, updateTime);
         contentValues.put(Notes.NOTEBOOKS_ID, notebooksId);
         return getContentResolver().insert(EvernoteContentProvider.NOTEBOOKS_URI, contentValues);
+    }
+
+    public int updateNotebook(Long notebooksId, String name) {
+        ContentValues values = new ContentValues();
+        Long updateTime = new Date().getTime();
+        values.put(Notebooks.NAME, name);
+        values.put(Notebooks.UPDATED, updateTime);
+        Uri notebookUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTEBOOKS_URI, notebooksId);
+        return getContentResolver().update(notebookUri, values, null, null);
     }
 }

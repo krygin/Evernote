@@ -80,6 +80,9 @@ public class MainActivity extends ActionBarActivity {
             case 1:
                 fragment = new NotebooksFragment();
                 break;
+            case 2:
+                fragment = new TransactionsFragment();
+                break;
             default:
                 break;
         }

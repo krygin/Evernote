@@ -10,7 +10,6 @@ import com.evernote.thrift.transport.TTransportException;
 import java.io.File;
 
 import ru.bmstu.evernote.account.EvernoteSession;
-import ru.bmstu.evernote.data.TEvernoteHttpClient;
 
 /**
  * Created by Ivan on 10.12.2014.

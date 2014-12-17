@@ -13,18 +13,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.evernote.edam.type.User;
-import com.evernote.edam.userstore.AuthenticationResult;
 
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.builder.api.EvernoteApi;
-import org.scribe.exceptions.OAuthException;
 import org.scribe.model.Token;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
-import org.scribe.utils.OAuthEncoder;
 
-
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ru.bmstu.evernote.R;
@@ -119,8 +114,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
         String webApiUrlPrefix = evernoteAuthToken.getWebApiUrlPrefix();
         userdata.putString(EvernoteAccount.EXTRA_NOTE_STORE_URL, noteStoreUrl);
         userdata.putString(EvernoteAccount.EXTRA_WEB_API_URL_PREFIX, webApiUrlPrefix);
-        userdata.putInt(EvernoteAccount.EXTRA_LAST_UPDATED_COUNT, 0);
-        userdata.putInt(EvernoteAccount.EXTRA_LAST_UPDATED_COUNT, 0);
+        userdata.putString(EvernoteAccount.EXTRA_LAST_SYNC_TIME, "0");
+        userdata.putString(EvernoteAccount.EXTRA_LAST_UPDATED_COUNT, "0");
         if (accountManager.addAccountExplicitly(account, null, userdata)) {
             result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
@@ -197,7 +192,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
                     try {
                         Token reqToken = new Token(mRequestToken, mRequestTokenSecret);
                         Token authToken = service.getAccessToken(reqToken, verifier);
-                        User user = EvernoteSession.getInstance().getClientFactory().getUserStoreClient().getUser(authToken.getToken());
+                        User user = EvernoteSession.initInstance(LoginActivity.this, EvernoteSession.EvernoteService.SANDBOX).getClientFactory().getUserStoreClient().getUser(authToken.getToken());
                         evernoteAuthToken = new EvernoteAuthToken(authToken, user);
                     } catch (Exception ex) {
                         Log.e(LOGTAG, "Failed to obtain OAuth access token", ex);
