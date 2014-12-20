@@ -18,7 +18,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import ru.bmstu.evernote.CreateNotebookDialog;
 import ru.bmstu.evernote.R;
 
 public class MainActivity extends ActionBarActivity {

@@ -20,8 +20,6 @@ import org.scribe.model.Token;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 
-import java.util.regex.Pattern;
-
 import ru.bmstu.evernote.R;
 
 /**
@@ -34,12 +32,9 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
     public static final String EXTRA_TOKEN_TYPE = "EXTRA_TOKEN_TYPE";
 
-    private static final String CONSUMER_KEY = "krygin";
-    private static final String CONSUMER_SECRET = "3898941278b76f9b";
+    private static final String CONSUMER_KEY = "krygin-8558";
+    private static final String CONSUMER_SECRET = "d3715b2333d2cf8c";
     private static final String CALLBACK_SCHEME = "bmstu-oauth";
-
-    private static final Pattern NOTESTORE_REGEX = Pattern.compile("edam_noteStoreUrl=([^&]+)");
-    private static final Pattern WEBAPI_REGEX = Pattern.compile("edam_webApiUrlPrefix=([^&]+)");
 
     private String mRequestToken = null;
     private String mRequestTokenSecret = null;

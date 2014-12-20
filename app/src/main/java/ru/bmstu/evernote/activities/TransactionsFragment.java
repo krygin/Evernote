@@ -21,7 +21,7 @@ public class TransactionsFragment extends ListFragment implements LoaderManager.
 
     private CursorAdapter mAdapter;
 
-    private String[] from = new String[]{Transactions._ID, Transactions.URI, Transactions.METHOD};
+    private String[] from = new String[]{Transactions._ID, Transactions.TYPE, Transactions.METHOD};
     private int[] to = new int[]{R.id.id, R.id.uri, R.id.method};
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -48,27 +48,13 @@ public class TransactionsFragment extends ListFragment implements LoaderManager.
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
 
-        Loader loader = null;
-        try {
-            loader = new CursorLoader(
+        return new CursorLoader(
                     getActivity(),
                     EvernoteContentProvider.TRANSACTION_URI,
                     Transactions.ALL_COLUMNS,
                     null,
                     null,
                     null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return loader;
-//        return new CursorLoader(
-//                getActivity(),
-//                EvernoteContentProvider.TRANSACTION_URI,
-//                Transactions.ALL_COLUMNS,
-//                null,
-//                null,
-//                null);
     }
 
     @Override

@@ -51,7 +51,7 @@ public class NotebooksFragment extends ListFragment implements LoaderManager.Loa
                 getActivity(),
                 EvernoteContentProvider.NOTEBOOKS_URI,
                 Notebooks.ALL_COLUMNS,
-                null,
+                Notebooks.NOT_DELETED_CONDITION,
                 null,
                 null);
     }

@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import ru.bmstu.evernote.provider.database.tables.Notebooks;
 import ru.bmstu.evernote.provider.database.tables.Notes;
+import ru.bmstu.evernote.provider.database.tables.Resources;
 import ru.bmstu.evernote.provider.database.tables.Transactions;
 
 /**
@@ -23,12 +24,14 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(Notebooks.SQL_CREATE);
         sqLiteDatabase.execSQL(Notes.SQL_CREATE);
+        sqLiteDatabase.execSQL(Resources.SQL_CREATE);
         sqLiteDatabase.execSQL(Transactions.SQL_CREATE);
     }
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
-        sqLiteDatabase.execSQL(Notebooks.SQL_DROP);
+        sqLiteDatabase.execSQL(Resources.SQL_DROP);
         sqLiteDatabase.execSQL(Notes.SQL_DROP);
+        sqLiteDatabase.execSQL(Notebooks.SQL_DROP);
         sqLiteDatabase.execSQL(Transactions.SQL_DROP);
         onCreate(sqLiteDatabase);
     }

@@ -1,4 +1,4 @@
-package ru.bmstu.evernote;
+package ru.bmstu.evernote.activities;
 
 import android.app.DialogFragment;
 import android.content.ComponentName;
@@ -12,19 +12,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import ru.bmstu.evernote.R;
+import ru.bmstu.evernote.provider.database.ContentProviderHelperService;
+import ru.bmstu.evernote.provider.database.IClientAPI;
+
 /**
  * Created by Ivan on 15.12.2014.
  */
 public class CreateNotebookDialog extends DialogFragment implements View.OnClickListener {
 
-    private ContentProviderHelperService mService = null;
+    private IClientAPI mService = null;
 
     private EditText editText = null;
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             ContentProviderHelperService.ContentProviderHelperBinder binder = (ContentProviderHelperService.ContentProviderHelperBinder)iBinder;
-            mService = binder.getService();
+            mService = binder.getClientApiService();
         }
 
         @Override

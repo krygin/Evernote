@@ -45,7 +45,11 @@ public class SplashScreen extends Activity {
                     public void run(AccountManagerFuture<Bundle> future) {
                         try {
                             future.getResult();
-                            MainActivity.startMainActivity(mContext);
+                            try {
+                                MainActivity.startMainActivity(mContext);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         } catch (OperationCanceledException | IOException | AuthenticatorException e) {
                             SplashScreen.this.finish();
                         }

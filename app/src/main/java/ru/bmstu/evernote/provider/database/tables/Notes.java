@@ -14,7 +14,7 @@ public interface Notes extends BaseColumns {
     String CREATED = "created";
     String USN = "usn";
     String NOTEBOOKS_ID = "notebooks_id";
-    String TABLE_PATH = "notes";
+    String IS_LOCALLY_DELETED = "is_locally_deleted";
 
     String[] ALL_COLUMNS = new String[]{_ID, TITLE, GUID, CREATED, UPDATED, USN, NOTEBOOKS_ID};
     String SQL_CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
@@ -24,16 +24,9 @@ public interface Notes extends BaseColumns {
             CREATED + " NUMERIC NOT NULL" + "," +
             UPDATED + " NUMERIC NOT NULL" + "," +
             USN + " INTEGER" + "," +
+            IS_LOCALLY_DELETED + " INTEGER" + "," +
             NOTEBOOKS_ID + " INTEGER NOT NULL" + " REFERENCES " + Notebooks.TABLE_NAME + " (" + Notebooks._ID + ")" + " ON DELETE CASCADE" +
             ")";
-    String SQL_INSERT = "INSERT INTO " + TABLE_NAME + " (" +
-            TITLE + "," +
-            GUID + "," +
-            CREATED + "," +
-            UPDATED + "," +
-            USN + "," +
-            NOTEBOOKS_ID +
-            ") VALUES ( ?, ?, ?, ?, ?, ? )";
 
     String[] DEFAULT_PROJECTION = new String[]{_ID, TITLE, GUID, CREATED, UPDATED, USN};
 
@@ -41,6 +34,8 @@ public interface Notes extends BaseColumns {
 
     String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.evernote.notes";
     String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.evernote.notes";
+
+    String NOT_DELETED_CONDITION = IS_LOCALLY_DELETED + "=0";
 
     String[] BASE_PROJECTION = new String[]{_ID, TITLE, CREATED, UPDATED};
     String[] BASE_SELECTION_CLAUSE = new String[] { "WHERE " + NOTEBOOKS_ID + "= ?" };
