@@ -11,7 +11,6 @@ import android.os.IBinder;
 import com.evernote.edam.limits.Constants;
 
 import java.util.Date;
-import java.util.List;
 
 import ru.bmstu.evernote.provider.EvernoteContentProvider;
 import ru.bmstu.evernote.provider.database.tables.Notebooks;
@@ -52,7 +51,7 @@ public class ContentProviderHelperService extends Service implements IClientAPI,
     }
 
     @Override
-    public boolean insertNote(String title, long notebooksId, List<String> resources) {
+    public boolean insertNote(String title, long notebooksId) {
         ContentValues contentValues = new ContentValues();
         Long currentTime = new Date().getTime();
         contentValues.put(Notes.TITLE, title);
@@ -61,15 +60,6 @@ public class ContentProviderHelperService extends Service implements IClientAPI,
         contentValues.put(Notes.NOTEBOOKS_ID, notebooksId);
         contentValues.put(Notes.IS_LOCALLY_DELETED, 0);
         Uri result = getContentResolver().insert(EvernoteContentProvider.NOTEBOOKS_URI, contentValues);
-        long notesId = Long.parseLong(result.getLastPathSegment());
-        contentValues.clear();
-        for (String resource: resources) {
-            contentValues.put(Resources.PATH_TO_RESOURCE, resource);
-            contentValues.put(Resources.MIME_TYPE, Constants.EDAM_MIME_TYPE_DEFAULT);
-            contentValues.put(Resources.NOTES_ID, notesId);
-            getContentResolver().insert(EvernoteContentProvider.NOTES_URI, contentValues);
-            contentValues.clear();
-        }
         return result != null;
     }
 
