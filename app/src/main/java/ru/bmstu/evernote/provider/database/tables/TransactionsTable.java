@@ -5,7 +5,7 @@ import android.provider.BaseColumns;
 /**
  * Created by Ivan on 16.12.2014.
  */
-public interface Transactions extends BaseColumns {
+public interface TransactionsTable extends BaseColumns {
     String TABLE_NAME = "transactions";
 
     String METHOD = "method";

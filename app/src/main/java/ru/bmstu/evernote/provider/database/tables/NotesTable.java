@@ -5,7 +5,7 @@ import android.provider.BaseColumns;
 /**
  * Created by Ivan on 14.12.2014.
  */
-public interface Notes extends BaseColumns {
+public interface NotesTable extends BaseColumns {
     String TABLE_NAME = "notes";
 
     String TITLE = "title";
@@ -25,7 +25,7 @@ public interface Notes extends BaseColumns {
             UPDATED + " NUMERIC NOT NULL" + "," +
             USN + " INTEGER" + "," +
             IS_LOCALLY_DELETED + " INTEGER" + "," +
-            NOTEBOOKS_ID + " INTEGER NOT NULL" + " REFERENCES " + Notebooks.TABLE_NAME + " (" + Notebooks._ID + ")" + " ON DELETE CASCADE" +
+            NOTEBOOKS_ID + " INTEGER NOT NULL" + " REFERENCES " + NotebooksTable.TABLE_NAME + " (" + NotebooksTable._ID + ")" + " ON DELETE CASCADE" +
             ")";
 
     String[] DEFAULT_PROJECTION = new String[]{_ID, TITLE, GUID, CREATED, UPDATED, USN};
@@ -40,4 +40,5 @@ public interface Notes extends BaseColumns {
     String[] BASE_PROJECTION = new String[]{_ID, TITLE, CREATED, UPDATED};
     String[] BASE_SELECTION_CLAUSE = new String[] { "WHERE " + NOTEBOOKS_ID + "= ?" };
 
+    String TABLE_NAME_TRANSACT = TABLE_NAME + "/transact";
 }

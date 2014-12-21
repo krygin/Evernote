@@ -14,14 +14,14 @@ import android.widget.SimpleCursorAdapter;
 
 import ru.bmstu.evernote.R;
 import ru.bmstu.evernote.provider.EvernoteContentProvider;
-import ru.bmstu.evernote.provider.database.tables.Transactions;
+import ru.bmstu.evernote.provider.database.tables.TransactionsTable;
 
 public class TransactionsFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
 
     private CursorAdapter mAdapter;
 
-    private String[] from = new String[]{Transactions._ID, Transactions.TYPE, Transactions.METHOD};
+    private String[] from = new String[]{TransactionsTable._ID, TransactionsTable.TYPE, TransactionsTable.METHOD};
     private int[] to = new int[]{R.id.id, R.id.uri, R.id.method};
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -51,7 +51,7 @@ public class TransactionsFragment extends ListFragment implements LoaderManager.
         return new CursorLoader(
                     getActivity(),
                     EvernoteContentProvider.TRANSACTION_URI,
-                    Transactions.ALL_COLUMNS,
+                    TransactionsTable.ALL_COLUMNS,
                     null,
                     null,
                     null);

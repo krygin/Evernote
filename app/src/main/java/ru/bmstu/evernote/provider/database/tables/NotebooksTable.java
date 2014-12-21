@@ -5,7 +5,7 @@ import android.provider.BaseColumns;
 /**
  * Created by Ivan on 11.12.2014.
  */
-public interface Notebooks extends BaseColumns {
+public interface NotebooksTable extends BaseColumns {
     String TABLE_NAME = "notebooks";
 
 
@@ -39,7 +39,7 @@ public interface Notebooks extends BaseColumns {
     String[] TEST_PROJECTION = new String[]{_ID, NAME, GUID, CREATED};
 
 
-    String NOTEBOOKS_WITH_NOTES_TABLE = Notebooks.TABLE_NAME + " LEFT JOIN " + Notes.TABLE_NAME + " ON " + Notes.TABLE_NAME + "." + Notes.NOTEBOOKS_ID + "=" + Notebooks.TABLE_NAME + "." + Notebooks._ID;
+    String NOTEBOOKS_WITH_NOTES_TABLE = NotebooksTable.TABLE_NAME + " LEFT JOIN " + NotesTable.TABLE_NAME + " ON " + NotesTable.TABLE_NAME + "." + NotesTable.NOTEBOOKS_ID + "=" + NotebooksTable.TABLE_NAME + "." + NotebooksTable._ID;
     String NOTEBOOKS_WITH_NOTES_PROJECTION = "";
     String SQL_DROP = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
@@ -47,4 +47,5 @@ public interface Notebooks extends BaseColumns {
     String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.evernote.notebooks";
 
     String NOT_DELETED_CONDITION = IS_LOCALLY_DELETED + "=0";
+    String TABLE_NAME_TRANSACT = TABLE_NAME + "/transact";
 }

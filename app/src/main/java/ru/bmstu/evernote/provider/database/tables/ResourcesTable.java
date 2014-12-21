@@ -5,7 +5,7 @@ import android.provider.BaseColumns;
 /**
  * Created by Ivan on 18.12.2014.
  */
-public interface Resources extends BaseColumns {
+public interface ResourcesTable extends BaseColumns {
     String TABLE_NAME = "resources";
 
     String MIME_TYPE = "mime_type";
@@ -22,7 +22,7 @@ public interface Resources extends BaseColumns {
             GUID + " TEXT UNIQUE" + "," +
             MIME_TYPE + " TEXT NOT NULL" + "," +
             IS_LOCALLY_DELETED + " INTEGER" + "," +
-            NOTES_ID + " INTEGER NOT NULL" + " REFERENCES " + Notes.TABLE_NAME + " (" + Notes._ID + ")" + " ON DELETE CASCADE" +
+            NOTES_ID + " INTEGER NOT NULL" + " REFERENCES " + NotesTable.TABLE_NAME + " (" + NotesTable._ID + ")" + " ON DELETE CASCADE" +
             ")";
 
     String[] DEFAULT_PROJECTION = new String[]{_ID, MIME_TYPE, PATH_TO_RESOURCE};
@@ -33,4 +33,5 @@ public interface Resources extends BaseColumns {
     String NOT_DELETED_CONDITION = IS_LOCALLY_DELETED + "=0";
     String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.evernote.resources";
     String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.evernote.resources";
+    String TABLE_NAME_TRANSACT = TABLE_NAME + "/transact";
 }

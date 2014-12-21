@@ -7,10 +7,10 @@ package ru.bmstu.evernote.provider.database;
 public interface IClientAPI {
     boolean insertNotebook(String name);
     boolean insertNote(String title, long notebooksId);
+    boolean insertResource(long notesId, String resource);
     boolean updateNotebook(long notebooksId, String name);
-    boolean updateNote(String name, long notebooksId);
+    boolean updateNote(String name, long notesId);
     boolean deleteNote(long notesId);
     boolean deleteNotebook(long notebooksId);
-    boolean insertResource(long notesId, String resource);
     boolean deleteResource(long resourceId);
 }

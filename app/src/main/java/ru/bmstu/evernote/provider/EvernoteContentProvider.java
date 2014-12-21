@@ -10,13 +10,13 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 import ru.bmstu.evernote.provider.database.DBHelper;
-import ru.bmstu.evernote.provider.database.tables.Notebooks;
-import ru.bmstu.evernote.provider.database.tables.Notes;
-import ru.bmstu.evernote.provider.database.tables.Resources;
-import ru.bmstu.evernote.provider.database.tables.Transactions;
+import ru.bmstu.evernote.provider.database.tables.NotebooksTable;
+import ru.bmstu.evernote.provider.database.tables.NotesTable;
+import ru.bmstu.evernote.provider.database.tables.ResourcesTable;
+import ru.bmstu.evernote.provider.database.tables.TransactionsTable;
 
-import static ru.bmstu.evernote.provider.database.tables.Transactions.Method;
-import static ru.bmstu.evernote.provider.database.tables.Transactions.Type;
+import static ru.bmstu.evernote.provider.database.tables.TransactionsTable.Method;
+import static ru.bmstu.evernote.provider.database.tables.TransactionsTable.Type;
 
 public class EvernoteContentProvider extends ContentProvider {
     private static final String LOGTAG = EvernoteContentProvider.class.getSimpleName();
@@ -25,11 +25,16 @@ public class EvernoteContentProvider extends ContentProvider {
 
     public static final Uri AUTHORITY_URI = Uri.parse("content://" + AUTHORITY);
 
-    public static final Uri TRANSACTION_URI = Uri.withAppendedPath(AUTHORITY_URI, Transactions.TABLE_NAME);
+    public static final Uri TRANSACTION_URI = Uri.withAppendedPath(AUTHORITY_URI, TransactionsTable.TABLE_NAME);
 
-    public static final Uri NOTEBOOKS_URI = Uri.withAppendedPath(AUTHORITY_URI, Notebooks.TABLE_NAME);
-    public static final Uri NOTES_URI = Uri.withAppendedPath(AUTHORITY_URI, Notes.TABLE_NAME);
-    public static final Uri RESOURCES_URI = Uri.withAppendedPath(AUTHORITY_URI, Resources.TABLE_NAME);
+    public static final Uri NOTEBOOKS_URI = Uri.withAppendedPath(AUTHORITY_URI, NotebooksTable.TABLE_NAME);
+    public static final Uri NOTES_URI = Uri.withAppendedPath(AUTHORITY_URI, NotesTable.TABLE_NAME);
+    public static final Uri RESOURCES_URI = Uri.withAppendedPath(AUTHORITY_URI, ResourcesTable.TABLE_NAME);
+
+
+    public static final Uri NOTEBOOKS_URI_TRANSACT = Uri.withAppendedPath(NOTEBOOKS_URI, "transact");
+    public static final Uri NOTES_URI_TRANSACT = Uri.withAppendedPath(NOTES_URI, "transact");
+    public static final Uri RESOURCES_URI_TRANSACT = Uri.withAppendedPath(RESOURCES_URI, "transact");
 
     private static final UriMatcher URI_MATCHER;
 
@@ -38,23 +43,37 @@ public class EvernoteContentProvider extends ContentProvider {
     private static final int TRANSACTIONS = 0;
     private static final int TRANSACTIONS_ID = 1;
 
-    private static final int NOTEBOOKS = 2;
-    private static final int NOTEBOOKS_ID = 3;
-    private static final int NOTES = 4;
-    private static final int NOTES_ID = 5;
-    private static final int RESOURCES = 6;
-    private static final int RESOURCES_ID = 7;
+    private static final int NOTEBOOKS_TRANSACT = 2;
+    private static final int NOTEBOOKS_ID_TRANSACT = 3;
+    private static final int NOTES_TRANSACT = 4;
+    private static final int NOTES_ID_TRANSACT = 5;
+    private static final int RESOURCES_TRANSACT = 6;
+    private static final int RESOURCES_ID_TRANSACT = 7;
+
+    private static final int NOTEBOOKS = 8;
+    private static final int NOTEBOOKS_ID = 9;
+    private static final int NOTES = 10;
+    private static final int NOTES_ID = 11;
+    private static final int RESOURCES = 12;
+    private static final int RESOURCES_ID = 13;
 
     static {
         URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-        URI_MATCHER.addURI(AUTHORITY, Transactions.TABLE_NAME, TRANSACTIONS);
-        URI_MATCHER.addURI(AUTHORITY, Transactions.TABLE_NAME + "/#", TRANSACTIONS_ID);
-        URI_MATCHER.addURI(AUTHORITY, Notebooks.TABLE_NAME, NOTEBOOKS);
-        URI_MATCHER.addURI(AUTHORITY, Notebooks.TABLE_NAME + "/#", NOTEBOOKS_ID);
-        URI_MATCHER.addURI(AUTHORITY, Notes.TABLE_NAME, NOTES);
-        URI_MATCHER.addURI(AUTHORITY, Notes.TABLE_NAME + "/#", NOTES_ID);
-        URI_MATCHER.addURI(AUTHORITY, Resources.TABLE_NAME, RESOURCES);
-        URI_MATCHER.addURI(AUTHORITY, Resources.TABLE_NAME + "/#", RESOURCES_ID);
+        URI_MATCHER.addURI(AUTHORITY, TransactionsTable.TABLE_NAME, TRANSACTIONS);
+        URI_MATCHER.addURI(AUTHORITY, TransactionsTable.TABLE_NAME + "/#", TRANSACTIONS_ID);
+        URI_MATCHER.addURI(AUTHORITY, NotebooksTable.TABLE_NAME_TRANSACT, NOTEBOOKS_TRANSACT);
+        URI_MATCHER.addURI(AUTHORITY, NotebooksTable.TABLE_NAME_TRANSACT + "/#", NOTEBOOKS_ID_TRANSACT);
+        URI_MATCHER.addURI(AUTHORITY, NotesTable.TABLE_NAME_TRANSACT, NOTES_TRANSACT);
+        URI_MATCHER.addURI(AUTHORITY, NotesTable.TABLE_NAME_TRANSACT + "/#", NOTES_ID_TRANSACT);
+        URI_MATCHER.addURI(AUTHORITY, ResourcesTable.TABLE_NAME_TRANSACT, RESOURCES_TRANSACT);
+        URI_MATCHER.addURI(AUTHORITY, ResourcesTable.TABLE_NAME_TRANSACT + "/#", RESOURCES_ID_TRANSACT);
+
+        URI_MATCHER.addURI(AUTHORITY, NotebooksTable.TABLE_NAME, NOTEBOOKS);
+        URI_MATCHER.addURI(AUTHORITY, NotebooksTable.TABLE_NAME + "/#", NOTEBOOKS_ID);
+        URI_MATCHER.addURI(AUTHORITY, NotesTable.TABLE_NAME, NOTES);
+        URI_MATCHER.addURI(AUTHORITY, NotesTable.TABLE_NAME + "/#", NOTES_ID);
+        URI_MATCHER.addURI(AUTHORITY, ResourcesTable.TABLE_NAME, RESOURCES);
+        URI_MATCHER.addURI(AUTHORITY, ResourcesTable.TABLE_NAME + "/#", RESOURCES_ID);
     }
 
     @Override
@@ -66,14 +85,14 @@ public class EvernoteContentProvider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
         switch (URI_MATCHER.match(uri)) {
-            case NOTEBOOKS:
-                return Notebooks.CONTENT_TYPE;
-            case NOTEBOOKS_ID:
-                return Notebooks.CONTENT_ITEM_TYPE;
-            case NOTES:
-                return Notes.CONTENT_TYPE;
-            case NOTES_ID:
-                return Notes.CONTENT_ITEM_TYPE;
+            case NOTEBOOKS_TRANSACT:
+                return NotebooksTable.CONTENT_TYPE;
+            case NOTEBOOKS_ID_TRANSACT:
+                return NotebooksTable.CONTENT_ITEM_TYPE;
+            case NOTES_TRANSACT:
+                return NotesTable.CONTENT_TYPE;
+            case NOTES_ID_TRANSACT:
+                return NotesTable.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
@@ -82,28 +101,55 @@ public class EvernoteContentProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         Uri result = null;
+        long id;
         final SQLiteDatabase dbConnection = helper.getWritableDatabase();
         switch (URI_MATCHER.match(uri)) {
             case TRANSACTIONS:
             case TRANSACTIONS_ID:
-                long transactionId = dbConnection.insertOrThrow(Transactions.TABLE_NAME, null, values);
+                long transactionId = dbConnection.insertOrThrow(TransactionsTable.TABLE_NAME, null, values);
                 result = ContentUris.withAppendedId(uri, transactionId);
                 getContext().getContentResolver().notifyChange(result, null);
                 break;
-            case NOTEBOOKS:
-            case NOTEBOOKS_ID:
+            case NOTEBOOKS_TRANSACT:
+            case NOTEBOOKS_ID_TRANSACT:
                 dbConnection.beginTransaction();
-                long notebookId = dbConnection.insertOrThrow(Notebooks.TABLE_NAME, null, values);
-                result = ContentUris.withAppendedId(NOTEBOOKS_URI, notebookId);
-                updateTransactionsTable(Method.CREATE_OR_UPDATE, Type.NOTEBOOK, notebookId);
+                id = dbConnection.insertOrThrow(NotebooksTable.TABLE_NAME, null, values);
+                result = ContentUris.withAppendedId(NOTEBOOKS_URI, id);
+                updateTransactionsTable(Method.CREATE_OR_UPDATE, Type.NOTEBOOK, id);
                 dbConnection.setTransactionSuccessful();
                 dbConnection.endTransaction();
                 getContext().getContentResolver().notifyChange(result, null);
                 break;
-            case NOTES:
-            case NOTES_ID:
-                final long noteId = dbConnection.insertOrThrow(Notes.TABLE_NAME, null, values);
-                result = ContentUris.withAppendedId(NOTES_URI, noteId);
+            case NOTEBOOKS:
+            case NOTEBOOKS_ID:
+                id = dbConnection.insertOrThrow(NotebooksTable.TABLE_NAME, null, values);
+                result = ContentUris.withAppendedId(NOTEBOOKS_URI, id);
+                getContext().getContentResolver().notifyChange(result, null);
+                break;
+            case NOTES_TRANSACT:
+            case NOTES_ID_TRANSACT:
+                dbConnection.beginTransaction();
+                id = dbConnection.insertOrThrow(NotesTable.TABLE_NAME, null, values);
+                result = ContentUris.withAppendedId(NOTES_URI, id);
+                updateTransactionsTable(Method.CREATE_OR_UPDATE, Type.NOTE, id);
+                dbConnection.setTransactionSuccessful();
+                dbConnection.endTransaction();
+                getContext().getContentResolver().notifyChange(result, null);
+                break;
+            case RESOURCES:
+            case RESOURCES_ID:
+                id = dbConnection.insertOrThrow(ResourcesTable.TABLE_NAME, null, values);
+                result = ContentUris.withAppendedId(RESOURCES_URI, id);
+                getContext().getContentResolver().notifyChange(result, null);
+                break;
+            case RESOURCES_TRANSACT:
+            case RESOURCES_ID_TRANSACT:
+                dbConnection.beginTransaction();
+                id = dbConnection.insertOrThrow(ResourcesTable.TABLE_NAME, null, values);
+                result = ContentUris.withAppendedId(RESOURCES_URI, id);
+                updateTransactionsTable(Method.CREATE_OR_UPDATE, Type.RESOURCE, id);
+                dbConnection.setTransactionSuccessful();
+                dbConnection.endTransaction();
                 getContext().getContentResolver().notifyChange(result, null);
                 break;
             default:
@@ -114,10 +160,10 @@ public class EvernoteContentProvider extends ContentProvider {
 
     private void updateTransactionsTable(Method method, Type type, long id) {
         ContentValues transaction = new ContentValues();
-        transaction.put(Transactions.METHOD, method.ordinal());
-        transaction.put(Transactions.TYPE, type.ordinal());
-        transaction.put(Transactions.ID, id);
-        getContext().getContentResolver().insert(EvernoteContentProvider.TRANSACTION_URI, transaction);
+        transaction.put(TransactionsTable.METHOD, method.ordinal());
+        transaction.put(TransactionsTable.TYPE, type.ordinal());
+        transaction.put(TransactionsTable.ID, id);
+        insert(TRANSACTION_URI, transaction);
     }
 
     @Override
@@ -128,25 +174,25 @@ public class EvernoteContentProvider extends ContentProvider {
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         switch (URI_MATCHER.match(uri)) {
             case TRANSACTIONS:
-                builder.setTables(Transactions.TABLE_NAME);
+                builder.setTables(TransactionsTable.TABLE_NAME);
                 break;
             case TRANSACTIONS_ID:
-                builder.setTables(Transactions.TABLE_NAME);
-                builder.appendWhere(Transactions._ID + "=" + uri.getLastPathSegment());
+                builder.setTables(TransactionsTable.TABLE_NAME);
+                builder.appendWhere(TransactionsTable._ID + "=" + uri.getLastPathSegment());
                 break;
             case NOTEBOOKS:
-                builder.setTables(Notebooks.TABLE_NAME);
+                builder.setTables(NotebooksTable.TABLE_NAME);
                 break;
             case NOTEBOOKS_ID:
-                builder.setTables(Notebooks.TABLE_NAME);
-                builder.appendWhere(Notebooks._ID + "=" + uri.getLastPathSegment());
+                builder.setTables(NotebooksTable.TABLE_NAME);
+                builder.appendWhere(NotebooksTable._ID + "=" + uri.getLastPathSegment());
                 break;
             case NOTES:
-                builder.setTables(Notes.TABLE_NAME);
+                builder.setTables(NotesTable.TABLE_NAME);
                 break;
             case NOTES_ID:
-                builder.setTables(Notes.TABLE_NAME + " LEFT JOIN " + Resources.TABLE_NAME + " ON " + Resources.TABLE_NAME + "." + Resources.NOTES_ID + "=" + Notes.TABLE_NAME + "." + Notes._ID);
-                builder.appendWhere(Notes.TABLE_NAME + "." + Notes._ID + "=" + uri.getLastPathSegment());
+                builder.setTables(NotesTable.TABLE_NAME + " LEFT JOIN " + ResourcesTable.TABLE_NAME + " ON " + ResourcesTable.TABLE_NAME + "." + ResourcesTable.NOTES_ID + "=" + NotesTable.TABLE_NAME + "." + NotesTable._ID);
+                builder.appendWhere(NotesTable.TABLE_NAME + "." + NotesTable._ID + "=" + uri.getLastPathSegment());
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
@@ -162,33 +208,62 @@ public class EvernoteContentProvider extends ContentProvider {
                       String[] selectionArgs) {
         int updated = 0;
         Uri result = null;
+        long id;
         final SQLiteDatabase dbConnection = helper.getWritableDatabase();
         switch (URI_MATCHER.match(uri)) {
-            case NOTEBOOKS:
-                updated = dbConnection.update(Notebooks.TABLE_NAME, values, selection, selectionArgs);
-                break;
-            case NOTEBOOKS_ID:
+            case NOTEBOOKS_ID_TRANSACT:
+                id = Long.parseLong(uri.getLastPathSegment());
+                selection = NotebooksTable._ID + "=" + id;
                 dbConnection.beginTransaction();
-                long notebooksId = Long.parseLong(uri.getLastPathSegment());
-                selection = Notebooks._ID + "=" + notebooksId;
-                updated = dbConnection.update(Notebooks.TABLE_NAME, values, selection, null);
-                updateTransactionsTable(Method.CREATE_OR_UPDATE, Type.NOTEBOOK, notebooksId);
+                updated = dbConnection.update(NotebooksTable.TABLE_NAME, values, selection, null);
+                updateTransactionsTable(Method.CREATE_OR_UPDATE, Type.NOTEBOOK, id);
                 dbConnection.setTransactionSuccessful();
                 dbConnection.endTransaction();
-                result = ContentUris.withAppendedId(NOTEBOOKS_URI, notebooksId);
+                result = ContentUris.withAppendedId(NOTEBOOKS_URI, id);
                 getContext().getContentResolver().notifyChange(result, null);
                 break;
-            case NOTES:
-                updated = dbConnection.update(Notes.TABLE_NAME, values, selection, selectionArgs);
+            case NOTEBOOKS_ID:
+                id = Long.parseLong(uri.getLastPathSegment());
+                selection = NotebooksTable._ID + "=" + id;
+                updated = dbConnection.update(NotebooksTable.TABLE_NAME, values, selection, null);
+                result = ContentUris.withAppendedId(NOTEBOOKS_URI, id);
+                getContext().getContentResolver().notifyChange(result, null);
                 break;
-            case NOTES_ID:
+            case NOTES_ID_TRANSACT:
+                id = Long.parseLong(uri.getLastPathSegment());
+                selection = NotesTable._ID + "=" + uri.getLastPathSegment();
                 dbConnection.beginTransaction();
-                long notesId = Long.parseLong(uri.getLastPathSegment());
-                selection = Notes._ID + "=" + uri.getLastPathSegment();
-                updated = dbConnection.update(Notes.TABLE_NAME, values, selection, selectionArgs);
-                updateTransactionsTable(Method.CREATE_OR_UPDATE, Type.NOTE, notesId);
+                updated = dbConnection.update(NotesTable.TABLE_NAME, values, selection, null);
+                updateTransactionsTable(Method.CREATE_OR_UPDATE, Type.NOTE, id);
                 dbConnection.setTransactionSuccessful();
                 dbConnection.endTransaction();
+                result = ContentUris.withAppendedId(NOTES_URI, id);
+                getContext().getContentResolver().notifyChange(result, null);
+                break;
+            case NOTES_ID:
+                id = Long.parseLong(uri.getLastPathSegment());
+                selection = NotesTable._ID + "=" + id;
+                updated = dbConnection.update(NotesTable.TABLE_NAME, values, selection, null);
+                result = ContentUris.withAppendedId(NOTES_URI, id);
+                getContext().getContentResolver().notifyChange(result, null);
+                break;
+            case RESOURCES_ID_TRANSACT:
+                id = Long.parseLong(uri.getLastPathSegment());
+                selection = NotesTable._ID + "=" + uri.getLastPathSegment();
+                dbConnection.beginTransaction();
+                updated = dbConnection.update(ResourcesTable.TABLE_NAME, values, selection, null);
+                updateTransactionsTable(Method.CREATE_OR_UPDATE, Type.RESOURCE, id);
+                dbConnection.setTransactionSuccessful();
+                dbConnection.endTransaction();
+                result = ContentUris.withAppendedId(RESOURCES_URI, id);
+                getContext().getContentResolver().notifyChange(result, null);
+                break;
+            case RESOURCES_ID:
+                id = Long.parseLong(uri.getLastPathSegment());
+                selection = NotesTable._ID + "=" + id;
+                updated = dbConnection.update(ResourcesTable.TABLE_NAME, values, selection, null);
+                result = ContentUris.withAppendedId(RESOURCES_URI, id);
+                getContext().getContentResolver().notifyChange(result, null);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
@@ -199,28 +274,42 @@ public class EvernoteContentProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int deleted = 0;
+        ContentValues contentValues = new ContentValues();
         final SQLiteDatabase dbConnection = helper.getWritableDatabase();
         switch (URI_MATCHER.match(uri)) {
             case TRANSACTIONS:
-                deleted = dbConnection.delete(Transactions.TABLE_NAME, selection, selectionArgs);
+                deleted = dbConnection.delete(TransactionsTable.TABLE_NAME, selection, selectionArgs);
                 break;
             case TRANSACTIONS_ID:
-                selection = Transactions._ID + "=" + uri.getLastPathSegment();
-                deleted = dbConnection.delete(Transactions.TABLE_NAME, selection, selectionArgs);
+                selection = TransactionsTable._ID + "=" + uri.getLastPathSegment();
+                deleted = dbConnection.delete(TransactionsTable.TABLE_NAME, selection, selectionArgs);
                 break;
-            case NOTEBOOKS:
-                deleted = dbConnection.delete(Notebooks.TABLE_NAME, selection, selectionArgs);
+            case NOTEBOOKS_ID_TRANSACT:
+                selection = NotebooksTable._ID + "=" + uri.getLastPathSegment();
+                contentValues.put(NotebooksTable.IS_LOCALLY_DELETED, 1);
+                deleted = dbConnection.update(NotebooksTable.TABLE_NAME, contentValues, selection, null);
                 break;
             case NOTEBOOKS_ID:
-                selection = Notebooks._ID + "=" + uri.getLastPathSegment();
-                deleted = dbConnection.delete(Notebooks.TABLE_NAME, selection, selectionArgs);
+                selection = NotebooksTable._ID + "=" + uri.getLastPathSegment();
+                deleted = dbConnection.delete(NotebooksTable.TABLE_NAME, selection, null);
                 break;
-            case NOTES:
-                deleted = dbConnection.delete(Notes.TABLE_NAME, selection, selectionArgs);
+            case NOTES_ID_TRANSACT:
+                selection = NotesTable._ID + "=" + uri.getLastPathSegment();
+                contentValues.put(NotesTable.IS_LOCALLY_DELETED, 1);
+                deleted = dbConnection.update(NotesTable.TABLE_NAME, contentValues, selection, null);
                 break;
             case NOTES_ID:
-                selection = Notes._ID + "=" + uri.getLastPathSegment();
-                deleted = dbConnection.delete(Notes.TABLE_NAME, selection, selectionArgs);
+                selection = NotesTable._ID + "=" + uri.getLastPathSegment();
+                deleted = dbConnection.delete(NotesTable.TABLE_NAME, selection, null);
+                break;
+            case RESOURCES_ID_TRANSACT:
+                selection = ResourcesTable._ID + "=" + uri.getLastPathSegment();
+                contentValues.put(ResourcesTable.IS_LOCALLY_DELETED, 1);
+                deleted = dbConnection.update(ResourcesTable.TABLE_NAME, contentValues, selection, null);
+                break;
+            case RESOURCES_ID:
+                selection = ResourcesTable._ID + "=" + uri.getLastPathSegment();
+                deleted = dbConnection.delete(ResourcesTable.TABLE_NAME, selection, null);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
