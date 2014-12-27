@@ -82,12 +82,12 @@ public class ContentProviderHelperService extends Service implements IClientAPI 
     }
 
     @Override
-    public boolean updateNote(String title, long notesId) {
+    public boolean updateNote(String title, long notebooksId) {
         ContentValues values = new ContentValues();
         Long currentTime = new Date().getTime();
         values.put(NotesTable.TITLE, title);
         values.put(NotesTable.UPDATED, currentTime);
-        Uri notesUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTES_URI_TRANSACT, notesId);
+        Uri notesUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTES_URI_TRANSACT, notebooksId);
         int result = getContentResolver().update(notesUri, values, null, null);
         return result != 0;
     }

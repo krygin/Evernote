@@ -5,6 +5,10 @@
         android:id="@+id/create_notebook"
         android:title="Create notebook"
         android:icon="@android:drawable/ic_input_add" />
+    <item
+        android:id="@+id/create_note"
+        android:title="Create note"
+        android:icon="@android:drawable/ic_input_add" />
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"/>

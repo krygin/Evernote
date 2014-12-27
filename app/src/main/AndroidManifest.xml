@@ -17,6 +17,9 @@
             android:name=".account.LoginActivity"
             android:label="@string/title_activity_login" />
         <activity
+            android:name=".activities.ItemDetailActivity"
+            android:label="Детали" />
+        <activity
             android:name=".activities.SplashScreen"
             android:label="@string/title_activity_splash_screen" >
             <intent-filter>

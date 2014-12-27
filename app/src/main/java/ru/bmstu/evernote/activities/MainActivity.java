@@ -107,6 +107,8 @@ public class MainActivity extends ActionBarActivity {
             case R.id.create_notebook:
                 new CreateNotebookDialog().show(getFragmentManager(), "Create notebook dialog");
                 break;
+            case R.id.create_note:
+                new CreateNoteDialog().show(getFragmentManager(), "Create note dialog");
             default:
                 break;
         }
