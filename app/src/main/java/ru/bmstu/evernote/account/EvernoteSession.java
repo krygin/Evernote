@@ -97,7 +97,7 @@ public class EvernoteSession {
 
         String userAgent = packageName + " Android/" + packageVersion;
 
-        Locale locale = java.util.Locale.getDefault();
+        Locale locale = Locale.getDefault();
         if (locale == null) {
             userAgent += " (" + Locale.US + ");";
         } else {

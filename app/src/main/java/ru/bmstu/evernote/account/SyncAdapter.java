@@ -3,71 +3,48 @@ package ru.bmstu.evernote.account;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
-import android.content.ComponentName;
 import android.content.ContentProviderClient;
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.ServiceConnection;
 import android.content.SyncResult;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.RemoteException;
 
+import com.evernote.edam.error.EDAMNotFoundException;
 import com.evernote.edam.error.EDAMSystemException;
 import com.evernote.edam.error.EDAMUserException;
 import com.evernote.edam.notestore.NoteStore;
 import com.evernote.edam.notestore.SyncChunk;
 import com.evernote.edam.notestore.SyncChunkFilter;
 import com.evernote.edam.notestore.SyncState;
+import com.evernote.edam.type.Note;
 import com.evernote.edam.type.Notebook;
+import com.evernote.edam.type.Resource;
 import com.evernote.thrift.TException;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import ru.bmstu.evernote.provider.EvernoteContentProvider;
+import ru.bmstu.evernote.FileProcessor;
+import ru.bmstu.evernote.data.FileData;
 import ru.bmstu.evernote.provider.database.tables.NotebooksTable;
-import ru.bmstu.evernote.provider.database.tables.NotesTable;
-import ru.bmstu.evernote.provider.database.tables.ResourcesTable;
-import ru.bmstu.evernote.provider.database.tables.TransactionsTable;
-
-import static ru.bmstu.evernote.provider.database.tables.TransactionsTable.Method;
-import static ru.bmstu.evernote.provider.database.tables.TransactionsTable.Type;
 
 /**
  * Created by Ivan on 10.12.2014.
  */
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
-    private ContentResolver mContentResolver;
-
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-
-        }
-    };
+    private final Context mContext;
 
     public SyncAdapter(Context context) {
         super(context, true);
-
-        mContentResolver = context.getContentResolver();
+        mContext = context;
     }
 
 
     @Override
     public void onPerformSync(Account account, Bundle bundle, String s, ContentProviderClient contentProviderClient, SyncResult syncResult) {
         try {
+            DatabaseHelper databaseHelper = new DatabaseHelper(contentProviderClient);
             EvernoteSession evernoteSession = EvernoteSession.initInstance(getContext(), EvernoteSession.EvernoteService.SANDBOX);
             AccountManager accountManager = AccountManager.get(getContext());
             String authToken = accountManager.blockingGetAuthToken(account, account.type, false);
@@ -79,7 +56,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             long lastUpdateCount = Long.parseLong(accountManager.getUserData(account, EvernoteAccount.EXTRA_LAST_UPDATED_COUNT));
 
             if (fullSyncBefore > lastSyncTime) {
-                fullSync(noteStoreClient,authToken, updateCount, contentProviderClient);
+                fullSync(noteStoreClient, authToken, updateCount, databaseHelper);
             } else if (updateCount == lastUpdateCount) {
                 sendChanges();
             } else {
@@ -98,13 +75,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     }
 
-    private void fullSync(NoteStore.Client noteStoreClient, String authToken, long updateCount, ContentProviderClient contentProviderClient) throws TException, EDAMUserException, EDAMSystemException {
+    private void fullSync(NoteStore.Client noteStoreClient, String authToken, long updateCount, DatabaseHelper databaseHelper) throws TException, EDAMUserException, EDAMSystemException, RemoteException {
         int afterUSN = 0;
         int maxEntries = 10;
         SyncChunkFilter filter = new SyncChunkFilter();
         filter.setIncludeNotebooks(true);
         filter.setIncludeNotes(true);
-        filter.setIncludeResources(true);
+        filter.setIncludeNoteResources(true);
         List<SyncChunk> syncChunkList = new LinkedList<>();
 
 
@@ -114,158 +91,89 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             syncChunk = noteStoreClient.getFilteredSyncChunk(authToken, afterUSN, maxEntries, filter);
             chunkHighUSN = syncChunk.getChunkHighUSN();
             afterUSN = chunkHighUSN;
-            processSyncChunk(authToken, syncChunk, contentProviderClient);
+            processSyncChunk(authToken, noteStoreClient, syncChunk, databaseHelper);
         } while (chunkHighUSN < updateCount);
-
-        new Integer(4).toString();
     }
 
-    private void processSyncChunk(String authToken, SyncChunk syncChunk, ContentProviderClient contentProviderClient) {
+    private void processSyncChunk(String authToken, NoteStore.Client noteStoreClient, SyncChunk syncChunk, DatabaseHelper databaseHelper) throws RemoteException {
         List<Notebook> notebooks = syncChunk.getNotebooks();
-        if (notebooks != null) {
-            for (Notebook notebook : notebooks) {
-                try {
-                    String name = notebook.getName();
-                    String guid = notebook.getGuid();
-                    long usn = notebook.getUpdateSequenceNum();
-                    long created = notebook.getServiceCreated();
-                    long updated = notebook.getServiceUpdated();
-                    insertNotebook(contentProviderClient, name, guid, usn, created, updated);
-                } catch (Exception e) {
-                    e.printStackTrace();
+        processNotebooksFromChunk(databaseHelper, notebooks);
+        List<Note> notes = syncChunk.getNotes();
+        processNotesFromChunk(authToken, noteStoreClient, databaseHelper, notes);
+        List<Resource> resources = syncChunk.getResources();
+        processResourcesFromChunk(databaseHelper, resources);
+    }
+
+    private boolean processNotebooksFromChunk(DatabaseHelper databaseHelper, List<Notebook> notebooks) throws RemoteException {
+        if (notebooks == null) {
+            return true;
+        }
+        for (Notebook notebook : notebooks) {
+            String guid = notebook.getGuid();
+            String name = notebook.getName();
+            long usn = notebook.getUpdateSequenceNum();
+            long created = notebook.getServiceCreated();
+            long updated = notebook.getServiceUpdated();
+            Cursor cursor = databaseHelper.getNotebookByGuid(guid);
+            int count = cursor.getCount();
+            switch (count) {
+                case 0:
+                    if (!databaseHelper.insertNotebook(name, guid, usn, created, updated)) {
+                        databaseHelper.resolveNotebooksNamesConflict(name);
+                        databaseHelper.insertNotebook(name, guid, usn, created, updated);
+                    }
+                    break;
+                case 1:
+                    cursor.moveToFirst();
+                    long notebooksId = cursor.getLong(cursor.getColumnIndex(NotebooksTable._ID));
+                    databaseHelper.updateNotebook(name, usn, updated, notebooksId);
+                    databaseHelper.deleteNotebookTransactionIfExistsAndNotDelete(notebooksId);
+                    break;
+                case 2:
+                    throw new IllegalStateException();
+            }
+        }
+        return true;
+    }
+
+    private boolean processNotesFromChunk(String authToken, NoteStore.Client noteStoreClient, DatabaseHelper databaseHelper, List<Note> notes) {
+        if (notes == null)
+            return true;
+        for (Note note : notes) {
+            String guid = note.getGuid();
+            String notebooksGuid = note.getNotebookGuid();
+            long usn = note.getUpdateSequenceNum();
+            long created = note.getCreated();
+            long updated = note.getDeleted();
+            String title = note.getTitle();
+            String filename = "filename";
+            FileProcessor fp = new FileProcessor(mContext);
+            if (note.getResources() != null) {
+                note.getResources().get(0).getAttributes().getFileName();
+                for (Resource resource: note.getResources()) {
+                    byte[] data = new byte[resource.getData().getSize()];
+                    try {
+                        data = noteStoreClient.getResourceData(authToken, resource.getGuid());
+                    } catch (EDAMUserException e) {
+                        e.printStackTrace();
+                    } catch (EDAMSystemException e) {
+                        e.printStackTrace();
+                    } catch (EDAMNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (TException e) {
+                        e.printStackTrace();
+                    }
+                    fp.writeFile(filename, data);
+                    FileData fd = fp.readFile(filename);
+                    new Integer(3).toString();
                 }
             }
         }
+        return true;
     }
 
 
-    private class Transaction {
-        private long _id;
-        private Method method;
-        private Type type;
-        private long id;
-
-        private Transaction(long _id, Method method, Type type, long id) {
-            this._id = _id;
-            this.method = method;
-            this.type = type;
-            this.id = id;
-        }
-
-        public long get_id() {
-            return _id;
-        }
-
-        public Method getMethod() {
-            return method;
-        }
-
-        public Type getType() {
-            return type;
-        }
-
-        public long getId() {
-            return id;
-        }
-    }
-
-    private class Transactions {
-        private Map<Long, Transaction> transactions = new HashMap<>();
-        private NoteStore.Client noteStoreClient;
-        private String authToken;
-        public Transactions(Cursor cursor) {
-            while (cursor.moveToNext()) {
-                long _id = cursor.getLong(cursor.getColumnIndex(TransactionsTable._ID));
-                Method method = Method.values()[cursor.getInt(cursor.getColumnIndex(TransactionsTable.METHOD))];
-                Type type = Type.values()[cursor.getInt(cursor.getColumnIndex(TransactionsTable.TYPE))];
-                long id = cursor.getLong(cursor.getColumnIndex(TransactionsTable.ID));
-                transactions.put(_id, new Transaction(_id, method, type, id));
-            }
-        }
-
-        public Transaction getTransaction() {
-            return null;
-        }
-    }
-
-
-    private boolean insertNotebook(ContentProviderClient contentProviderClient, String name, String guid, long usn, long created, long updated) throws RemoteException {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(NotebooksTable.NAME, name);
-        contentValues.put(NotebooksTable.GUID, guid);
-        contentValues.put(NotebooksTable.USN, usn);
-        contentValues.put(NotebooksTable.CREATED, created);
-        contentValues.put(NotebooksTable.UPDATED, updated);
-        contentValues.put(NotebooksTable.IS_LOCALLY_DELETED, 0);
-        Uri result = contentProviderClient.insert(EvernoteContentProvider.NOTEBOOKS_URI, contentValues);
-        return result != null;
-    }
-
-
-    private boolean insertNote(ContentProviderClient contentProviderClient, String title, String guid, long usn, long created, long updated, long notebooksId) throws RemoteException {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(NotesTable.TITLE, title);
-        contentValues.put(NotesTable.GUID, guid);
-        contentValues.put(NotesTable.USN, usn);
-        contentValues.put(NotesTable.CREATED, created);
-        contentValues.put(NotesTable.UPDATED, updated);
-        contentValues.put(NotesTable.NOTEBOOKS_ID, notebooksId);
-        contentValues.put(NotesTable.IS_LOCALLY_DELETED, 0);
-        Uri result = contentProviderClient.insert(EvernoteContentProvider.NOTEBOOKS_URI, contentValues);
-        return result != null;
-    }
-
-
-    private boolean insertResource(ContentProviderClient contentProviderClient, String guid, String resource, String mimeType, long notesId) throws RemoteException {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(ResourcesTable.GUID, guid);
-        contentValues.put(ResourcesTable.PATH_TO_RESOURCE, resource);
-        contentValues.put(ResourcesTable.MIME_TYPE, mimeType);
-        contentValues.put(ResourcesTable.NOTES_ID, notesId);
-        contentValues.put(ResourcesTable.IS_LOCALLY_DELETED, 0);
-        Uri result = contentProviderClient.insert(EvernoteContentProvider.NOTES_URI, contentValues);
-        return result != null;
-    }
-
-
-    private boolean updateNotebook(ContentProviderClient contentProviderClient, String name, long usn, long updated, long notebooksId) throws RemoteException {
-        ContentValues values = new ContentValues();
-        values.put(NotebooksTable.NAME, name);
-        values.put(NotebooksTable.USN, usn);
-        values.put(NotebooksTable.UPDATED, updated);
-        Uri notebookUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTEBOOKS_URI, notebooksId);
-        int result = contentProviderClient.update(notebookUri, values, null, null);
-        return result != 0;
-    }
-
-    private boolean updateNote(ContentProviderClient contentProviderClient, String title, long usn, long updated, long notesId) throws RemoteException {
-        ContentValues values = new ContentValues();
-        values.put(NotesTable.TITLE, title);
-        values.put(NotesTable.USN, usn);
-        values.put(NotesTable.UPDATED, updated);
-        Uri notesUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTES_URI, notesId);
-        int result = contentProviderClient.update(notesUri, values, null, null);
-        return result != 0;
-    }
-
-
-    private boolean deleteNotebookFromDatabase(ContentProviderClient contentProviderClient, long notebooksId) throws RemoteException {
-        Uri notebookUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTEBOOKS_URI, notebooksId);
-        int result = contentProviderClient.delete(notebookUri, null, null);
-        return result != 0;
-    }
-
-
-    private boolean deleteNoteFromDatabase(ContentProviderClient contentProviderClient, long notesId) throws RemoteException {
-        Uri noteUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTEBOOKS_URI, notesId);
-        int result = contentProviderClient.delete(noteUri, null, null);
-        return result != 0;
-    }
-
-
-    private boolean deleteResourceFromDatabase(ContentProviderClient contentProviderClient, long resourcesId) throws RemoteException {
-        Uri resourceUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTEBOOKS_URI, resourcesId);
-        int result = contentProviderClient.delete(resourceUri, null, null);
-        return result != 0;
+    private void processResourcesFromChunk(DatabaseHelper databaseHelper, List<Resource> resources) {
+        return;
     }
 }
