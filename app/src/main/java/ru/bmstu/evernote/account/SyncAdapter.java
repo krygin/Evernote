@@ -100,8 +100,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         processNotebooksFromChunk(databaseHelper, notebooks);
         List<Note> notes = syncChunk.getNotes();
         processNotesFromChunk(authToken, noteStoreClient, databaseHelper, notes);
-        List<Resource> resources = syncChunk.getResources();
-        processResourcesFromChunk(databaseHelper, resources);
     }
 
     private boolean processNotebooksFromChunk(DatabaseHelper databaseHelper, List<Notebook> notebooks) throws RemoteException {
@@ -146,8 +144,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             long created = note.getCreated();
             long updated = note.getDeleted();
             String title = note.getTitle();
+            String content = note.getContent();
             String filename = "filename";
             FileProcessor fp = new FileProcessor(mContext);
+            FileData fileData = new FileData(new byte[4], null);
+
             if (note.getResources() != null) {
                 note.getResources().get(0).getAttributes().getFileName();
                 for (Resource resource: note.getResources()) {

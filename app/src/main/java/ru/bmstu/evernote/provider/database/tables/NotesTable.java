@@ -10,6 +10,7 @@ public interface NotesTable extends BaseColumns {
 
     String TITLE = "title";
     String GUID = "guid";
+    String CONTENT = "content";
     String UPDATED = "updated";
     String CREATED = "created";
     String USN = "usn";
@@ -21,6 +22,7 @@ public interface NotesTable extends BaseColumns {
             _ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
             TITLE + " TEXT UNIQUE NOT NULL" + "," +
             GUID + " TEXT" + "," +
+            CONTENT + "TEXT" + "," +
             CREATED + " NUMERIC NOT NULL" + "," +
             UPDATED + " NUMERIC NOT NULL" + "," +
             USN + " INTEGER" + "," +

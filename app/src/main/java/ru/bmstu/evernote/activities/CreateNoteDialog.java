@@ -12,12 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 
 import ru.bmstu.evernote.R;
 import ru.bmstu.evernote.provider.EvernoteContentProvider;
@@ -96,7 +93,7 @@ public class CreateNoteDialog extends DialogFragment implements View.OnClickList
 
     @Override
     public void onClick(View view) {
-        mService.insertNote(editText.getText().toString(), notebooksId);
+        mService.insertNote(editText.getText().toString(), null, notebooksId);
         dismiss();
     }
 }

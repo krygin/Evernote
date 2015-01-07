@@ -47,7 +47,7 @@ public class ContentProviderHelperService extends Service implements IClientAPI 
     }
 
     @Override
-    public boolean insertNote(String title, long notebooksId) {
+    public boolean insertNote(String title, String content, long notebooksId) {
         ContentValues contentValues = new ContentValues();
         Long currentTime = new Date().getTime();
         contentValues.put(NotesTable.TITLE, title);
@@ -55,6 +55,7 @@ public class ContentProviderHelperService extends Service implements IClientAPI 
         contentValues.put(NotesTable.UPDATED, currentTime);
         contentValues.put(NotesTable.NOTEBOOKS_ID, notebooksId);
         contentValues.put(NotesTable.IS_LOCALLY_DELETED, 0);
+        contentValues.put(NotesTable.CONTENT, content);
         Uri result = getContentResolver().insert(EvernoteContentProvider.NOTES_URI_TRANSACT, contentValues);
         return result != null;
     }
