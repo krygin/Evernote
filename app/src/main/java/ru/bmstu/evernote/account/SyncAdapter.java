@@ -26,7 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ru.bmstu.evernote.FileProcessor;
-import ru.bmstu.evernote.data.FileData;
 import ru.bmstu.evernote.provider.database.tables.NotebooksTable;
 import ru.bmstu.evernote.provider.database.tables.NotesTable;
 
@@ -50,12 +49,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             AccountManager accountManager = AccountManager.get(getContext());
             String authToken = accountManager.blockingGetAuthToken(account, account.type, false);
             NoteStore.Client noteStoreClient = evernoteSession.getClientFactory().getNoteStoreClient();
+
+
             SyncState syncState = noteStoreClient.getSyncState(authToken);
             long updateCount = syncState.getUpdateCount();
             long fullSyncBefore = syncState.getFullSyncBefore();
             long lastSyncTime = Long.parseLong(accountManager.getUserData(account, EvernoteAccount.EXTRA_LAST_SYNC_TIME));
             long lastUpdateCount = Long.parseLong(accountManager.getUserData(account, EvernoteAccount.EXTRA_LAST_UPDATED_COUNT));
-
             if (fullSyncBefore > lastSyncTime) {
                 fullSync(noteStoreClient, authToken, updateCount, databaseHelper);
             } else if (updateCount == lastUpdateCount) {
@@ -76,7 +76,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     }
 
-    private void fullSync(NoteStore.Client noteStoreClient, String authToken, long updateCount, DatabaseHelper databaseHelper) throws TException, EDAMUserException, EDAMSystemException, RemoteException {
+    private void fullSync(NoteStore.Client noteStoreClient, String authToken, long updateCount, DatabaseHelper databaseHelper) throws TException, EDAMUserException, EDAMSystemException, RemoteException, EDAMNotFoundException {
         int afterUSN = 0;
         int maxEntries = 10;
         SyncChunkFilter filter = new SyncChunkFilter();
@@ -96,7 +96,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         } while (chunkHighUSN < updateCount);
     }
 
-    private void processSyncChunk(String authToken, NoteStore.Client noteStoreClient, SyncChunk syncChunk, DatabaseHelper databaseHelper) throws RemoteException {
+    private void processSyncChunk(String authToken, NoteStore.Client noteStoreClient, SyncChunk syncChunk, DatabaseHelper databaseHelper) throws RemoteException, EDAMUserException, EDAMSystemException, EDAMNotFoundException, TException {
         List<Notebook> notebooks = syncChunk.getNotebooks();
         processNotebooksFromChunk(databaseHelper, notebooks);
         List<Note> notes = syncChunk.getNotes();
@@ -135,7 +135,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         return true;
     }
 
-    private boolean processNotesFromChunk(String authToken, NoteStore.Client noteStoreClient, DatabaseHelper databaseHelper, List<Note> notes) throws RemoteException {
+    private boolean processNotesFromChunk(String authToken, NoteStore.Client noteStoreClient, DatabaseHelper databaseHelper, List<Note> notes) throws RemoteException, EDAMUserException, EDAMSystemException, TException, EDAMNotFoundException {
         if (notes == null)
             return true;
         for (Note note : notes) {
@@ -145,48 +145,51 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             long created = note.getCreated();
             long updated = note.getDeleted();
             String title = note.getTitle();
-            String content = note.getContent();
+            String content = noteStoreClient.getNoteContent(authToken, guid);
             Cursor noteCursor = databaseHelper.getNoteByGuid(guid);
             Cursor notebooksCursor = databaseHelper.getNotebookByGuid(notebooksGuid);
-            long notebooksId = notebooksCursor.getLong(notebooksCursor.getColumnIndex(NotebooksTable._ID));
             int count = noteCursor.getCount();
+            notebooksCursor.moveToFirst();
+            long notebooksId = notebooksCursor.getLong(notebooksCursor.getColumnIndex(NotebooksTable._ID));
+            long notesId = 0;
             switch (count) {
                 case 0:
-                    databaseHelper.insertNote(title, guid, usn, created, updated, notebooksId);
+                    notesId = databaseHelper.insertNote(title, guid, usn, created, updated, notebooksId);
                     break;
                 case 1:
                     noteCursor.moveToFirst();
-                    long notesId = noteCursor.getLong(noteCursor.getColumnIndex(NotesTable._ID));
+                    notesId = noteCursor.getLong(noteCursor.getColumnIndex(NotesTable._ID));
                     databaseHelper.updateNote(title, usn, updated, notesId);
                     break;
                 case 2:
                     throw new IllegalStateException();
             }
             FileProcessor fp = new FileProcessor(mContext);
-            FileData fileData = new FileData(new byte[4], null);
 
             if (note.getResources() != null) {
                 for (Resource resource: note.getResources()) {
                     String filename = resource.getAttributes().getFileName();
+                    String mimeType = resource.getMime();
+
                     String resourceGuid = resource.getGuid();
                     Cursor resourceCursor = databaseHelper.getResourceByGuid(resourceGuid);
-                    byte[] data = new byte[resource.getData().getSize()];
-                    try {
-                        data = noteStoreClient.getResourceData(authToken, resource.getGuid());
-                    } catch (EDAMUserException | EDAMNotFoundException | EDAMSystemException | TException e) {
-                        e.printStackTrace();
+                    int resourcesCount = resourceCursor.getCount();
+                    long resourceId = 0;
+                    switch (resourcesCount) {
+                        case 0:
+                            byte[] data;
+                            resourceId = databaseHelper.insertResource(resourceGuid, filename, mimeType, notesId);
+                            data = noteStoreClient.getResourceData(authToken, resourceGuid);
+                            fp.writeFile(String.valueOf(resourceId), data);
+                            break;
+                        case 1:
+                            break;
+                        default:
+                            throw new IllegalStateException();
                     }
-                    fp.writeFile(filename, data);
-                    FileData fd = fp.readFile(filename);
-                    new Integer(3).toString();
                 }
             }
         }
         return true;
-    }
-
-
-    private void processResourcesFromChunk(DatabaseHelper databaseHelper, List<Resource> resources) {
-        return;
     }
 }

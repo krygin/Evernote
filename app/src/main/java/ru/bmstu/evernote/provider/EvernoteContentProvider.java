@@ -140,6 +140,12 @@ public class EvernoteContentProvider extends ContentProvider {
                 dbConnection.endTransaction();
                 getContext().getContentResolver().notifyChange(result, null);
                 break;
+            case NOTES:
+            case NOTES_ID:
+                id = dbConnection.insertOrThrow(NotesTable.TABLE_NAME, null, values);
+                result = ContentUris.withAppendedId(NOTES_URI, id);
+                getContext().getContentResolver().notifyChange(result, null);
+                break;
             case RESOURCES:
             case RESOURCES_ID:
                 id = dbConnection.insertOrThrow(ResourcesTable.TABLE_NAME, null, values);
