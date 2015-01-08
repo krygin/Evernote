@@ -66,8 +66,7 @@
         </service>
 
         <activity
-            android:name=".activities.MainActivity"
-            android:label="@string/title_activity_main" >
+            android:name=".activities.MainActivity" >
         </activity>
     </application>
 

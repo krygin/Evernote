@@ -151,4 +151,12 @@ public class DatabaseHelper {
         }
         return deleted == 1;
     }
+
+    public Cursor getResourceByGuid(String resourceGuid) {
+        return null;
+    }
+
+    public Cursor getNoteByGuid(String guid) {
+        return null;
+    }
 }

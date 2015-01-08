@@ -101,7 +101,7 @@ public class EvernoteContentProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         Uri result = null;
-        long id;
+        long id = 0;
         final SQLiteDatabase dbConnection = helper.getWritableDatabase();
         switch (URI_MATCHER.match(uri)) {
             case TRANSACTIONS:
@@ -129,7 +129,11 @@ public class EvernoteContentProvider extends ContentProvider {
             case NOTES_TRANSACT:
             case NOTES_ID_TRANSACT:
                 dbConnection.beginTransaction();
-                id = dbConnection.insertOrThrow(NotesTable.TABLE_NAME, null, values);
+                try {
+                    id = dbConnection.insertOrThrow(NotesTable.TABLE_NAME, null, values);
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
                 result = ContentUris.withAppendedId(NOTES_URI, id);
                 updateTransactionsTable(Method.CREATE_OR_UPDATE, Type.NOTE, id);
                 dbConnection.setTransactionSuccessful();

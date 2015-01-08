@@ -93,7 +93,7 @@ public class CreateNoteDialog extends DialogFragment implements View.OnClickList
 
     @Override
     public void onClick(View view) {
-        mService.insertNote(editText.getText().toString(), null, notebooksId);
+        mService.insertNote(editText.getText().toString(), "content", notebooksId);
         dismiss();
     }
 }

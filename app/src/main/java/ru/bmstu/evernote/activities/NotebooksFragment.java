@@ -55,6 +55,8 @@ public class NotebooksFragment extends ListFragment implements LoaderManager.Loa
         startActivity(intent);
     }
 
+
+
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(

@@ -22,7 +22,7 @@ public interface NotesTable extends BaseColumns {
             _ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
             TITLE + " TEXT UNIQUE NOT NULL" + "," +
             GUID + " TEXT" + "," +
-            CONTENT + "TEXT" + "," +
+            CONTENT + " TEXT" + "," +
             CREATED + " NUMERIC NOT NULL" + "," +
             UPDATED + " NUMERIC NOT NULL" + "," +
             USN + " INTEGER" + "," +

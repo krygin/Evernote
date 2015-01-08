@@ -28,6 +28,7 @@ import java.util.List;
 import ru.bmstu.evernote.FileProcessor;
 import ru.bmstu.evernote.data.FileData;
 import ru.bmstu.evernote.provider.database.tables.NotebooksTable;
+import ru.bmstu.evernote.provider.database.tables.NotesTable;
 
 /**
  * Created by Ivan on 10.12.2014.
@@ -134,7 +135,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         return true;
     }
 
-    private boolean processNotesFromChunk(String authToken, NoteStore.Client noteStoreClient, DatabaseHelper databaseHelper, List<Note> notes) {
+    private boolean processNotesFromChunk(String authToken, NoteStore.Client noteStoreClient, DatabaseHelper databaseHelper, List<Note> notes) throws RemoteException {
         if (notes == null)
             return true;
         for (Note note : notes) {
@@ -145,23 +146,34 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             long updated = note.getDeleted();
             String title = note.getTitle();
             String content = note.getContent();
-            String filename = "filename";
+            Cursor noteCursor = databaseHelper.getNoteByGuid(guid);
+            Cursor notebooksCursor = databaseHelper.getNotebookByGuid(notebooksGuid);
+            long notebooksId = notebooksCursor.getLong(notebooksCursor.getColumnIndex(NotebooksTable._ID));
+            int count = noteCursor.getCount();
+            switch (count) {
+                case 0:
+                    databaseHelper.insertNote(title, guid, usn, created, updated, notebooksId);
+                    break;
+                case 1:
+                    noteCursor.moveToFirst();
+                    long notesId = noteCursor.getLong(noteCursor.getColumnIndex(NotesTable._ID));
+                    databaseHelper.updateNote(title, usn, updated, notesId);
+                    break;
+                case 2:
+                    throw new IllegalStateException();
+            }
             FileProcessor fp = new FileProcessor(mContext);
             FileData fileData = new FileData(new byte[4], null);
 
             if (note.getResources() != null) {
-                note.getResources().get(0).getAttributes().getFileName();
                 for (Resource resource: note.getResources()) {
+                    String filename = resource.getAttributes().getFileName();
+                    String resourceGuid = resource.getGuid();
+                    Cursor resourceCursor = databaseHelper.getResourceByGuid(resourceGuid);
                     byte[] data = new byte[resource.getData().getSize()];
                     try {
                         data = noteStoreClient.getResourceData(authToken, resource.getGuid());
-                    } catch (EDAMUserException e) {
-                        e.printStackTrace();
-                    } catch (EDAMSystemException e) {
-                        e.printStackTrace();
-                    } catch (EDAMNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (TException e) {
+                    } catch (EDAMUserException | EDAMNotFoundException | EDAMSystemException | TException e) {
                         e.printStackTrace();
                     }
                     fp.writeFile(filename, data);
