@@ -41,7 +41,7 @@ public class DatabaseHelper {
     }
 
 
-    public boolean insertNote(String title, String guid, long usn, long created, long updated, long notebooksId) throws RemoteException {
+    public long insertNote(String title, String guid, long usn, long created, long updated, long notebooksId) throws RemoteException {
         ContentValues contentValues = new ContentValues();
         contentValues.put(NotesTable.TITLE, title);
         contentValues.put(NotesTable.GUID, guid);
@@ -50,20 +50,20 @@ public class DatabaseHelper {
         contentValues.put(NotesTable.UPDATED, updated);
         contentValues.put(NotesTable.NOTEBOOKS_ID, notebooksId);
         contentValues.put(NotesTable.IS_LOCALLY_DELETED, 0);
-        Uri result = contentProviderClient.insert(EvernoteContentProvider.NOTEBOOKS_URI, contentValues);
-        return result != null;
+        Uri result = contentProviderClient.insert(EvernoteContentProvider.NOTES_URI, contentValues);
+        return Long.parseLong(result.getLastPathSegment());
     }
 
 
-    public boolean insertResource(String guid, String resource, String mimeType, long notesId) throws RemoteException {
+    public long insertResource(String guid, String filename, String mimeType, long notesId) throws RemoteException {
         ContentValues contentValues = new ContentValues();
         contentValues.put(ResourcesTable.GUID, guid);
-        contentValues.put(ResourcesTable.PATH_TO_RESOURCE, resource);
+        contentValues.put(ResourcesTable.FILENAME, filename);
         contentValues.put(ResourcesTable.MIME_TYPE, mimeType);
         contentValues.put(ResourcesTable.NOTES_ID, notesId);
         contentValues.put(ResourcesTable.IS_LOCALLY_DELETED, 0);
         Uri result = contentProviderClient.insert(EvernoteContentProvider.NOTES_URI, contentValues);
-        return result != null;
+        return Long.parseLong(result.getLastPathSegment());
     }
 
 
@@ -150,5 +150,17 @@ public class DatabaseHelper {
             }
         }
         return deleted == 1;
+    }
+
+    public Cursor getResourceByGuid(String guid) throws RemoteException {
+        Cursor cursor = contentProviderClient.query(EvernoteContentProvider.RESOURCES_URI, ResourcesTable.ALL_COLUMNS,
+                ResourcesTable.GUID + "='" + guid + "'", null, null);
+        return cursor;
+    }
+
+    public Cursor getNoteByGuid(String guid) throws RemoteException {
+        Cursor cursor = contentProviderClient.query(EvernoteContentProvider.NOTES_URI, NotesTable.ALL_COLUMNS,
+                NotesTable.GUID + "='" + guid + "'", null, null);
+        return cursor;
     }
 }
