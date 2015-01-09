@@ -11,6 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,12 +39,16 @@ public class MainActivity extends ActionBarActivity {
         mListView = (ListView) findViewById(R.id.left_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setLogo(R.drawable.ic_app_logo);
+        toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
+        toolbar.setSubtitle("List view");
+        toolbar.setSubtitleTextColor(getResources().getColor(R.color.subtitle_color));
+        toolbar.inflateMenu(R.menu.add_items_toolbar);
         mActionBarToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name);
         mActionBarToggle.setDrawerIndicatorEnabled(true);
         mDrawerLayout.setDrawerListener(mActionBarToggle);
 
         mListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1, android.R.id.text1, mDrawerItemsViewsNames));
-
 
         mListView.setOnItemClickListener(new DrawerItemClickListener());
     }
