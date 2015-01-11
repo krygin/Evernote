@@ -79,10 +79,10 @@ public class MainActivity extends ActionBarActivity {
         Fragment fragment = null;
         switch (position) {
             case 0:
-                fragment = new NotesFragment();
+                fragment = new NotebooksFragment();
                 break;
             case 1:
-                fragment = new NotebooksFragment();
+                fragment = new NotesFragment();
                 break;
             case 2:
                 fragment = new TransactionsFragment();

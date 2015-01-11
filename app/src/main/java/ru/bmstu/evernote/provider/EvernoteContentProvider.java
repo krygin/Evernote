@@ -324,6 +324,7 @@ public class EvernoteContentProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
+        getContext().getContentResolver().notifyChange(uri, null);
         return deleted;
     }
 }
