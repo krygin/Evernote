@@ -204,6 +204,13 @@ public class EvernoteContentProvider extends ContentProvider {
                 builder.setTables(NotesTable.TABLE_NAME + " LEFT JOIN " + ResourcesTable.TABLE_NAME + " ON " + ResourcesTable.TABLE_NAME + "." + ResourcesTable.NOTES_ID + "=" + NotesTable.TABLE_NAME + "." + NotesTable._ID);
                 builder.appendWhere(NotesTable.TABLE_NAME + "." + NotesTable._ID + "=" + uri.getLastPathSegment());
                 break;
+            case RESOURCES:
+                builder.setTables(ResourcesTable.TABLE_NAME);
+                break;
+            case RESOURCES_ID:
+                builder.setTables(ResourcesTable.TABLE_NAME);
+                builder.appendWhere(ResourcesTable.TABLE_NAME + "." + ResourcesTable._ID + "=" + uri.getLastPathSegment());
+                break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
