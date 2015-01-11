@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="ru.bmstu.evernote.activities.ItemDetailActivity" >
+    <item android:id="@+id/action_edit"
+        android:icon="@drawable/ic_action_edit"
+        android:title="search"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="1"
+        android:menuCategory="secondary"/>
+    <item android:id="@+id/action_discard"
+        android:icon="@drawable/ic_action_discard"
+        android:title="search"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="1"
+        android:menuCategory="secondary"/>
+</menu>

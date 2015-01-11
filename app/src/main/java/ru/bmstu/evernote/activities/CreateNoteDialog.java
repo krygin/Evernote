@@ -8,14 +8,18 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
+import ru.bmstu.evernote.EvernoteUtil;
 import ru.bmstu.evernote.R;
 import ru.bmstu.evernote.provider.EvernoteContentProvider;
 import ru.bmstu.evernote.provider.database.ContentProviderHelperService;
@@ -57,7 +61,7 @@ public class CreateNoteDialog extends DialogFragment implements View.OnClickList
             getActivity().unbindService(serviceConnection);
         }
     }
-
+    String content = EvernoteUtil.NOTE_PREFIX + "Content of Note" + EvernoteUtil.NOTE_SUFFIX;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getDialog().setTitle("Добавить заметку");
@@ -88,12 +92,36 @@ public class CreateNoteDialog extends DialogFragment implements View.OnClickList
         v.findViewById(R.id.btnYes).setOnClickListener(this);
         v.findViewById(R.id.btnNo).setOnClickListener(this);
         editText = (EditText)v.findViewById(R.id.edit_text);
+        Button buttonYes = (Button)v.findViewById(R.id.btnYes);
+        Log.e("","@!(#*$^!&(*@^#$%)(!&@^#$(*&!@#^$(!*&#$^!(@#*&$");
+        Log.e("","!@$)(#*%&^!@(*&#^$!*(@#&$^(!@*#&$^(!#@*&$^!(*&");
+        Log.e("",content);
+        Log.e("","@!(#*$^!&(*@^#$%)(!&@^#$(*&!@#^$(!*&#$^!(@#*&$");
+        Log.e("","!@$)(#*%&^!@(*&#^$!*(@#&$^(!@*#&$^(!#@*&$^!(*&");
+        buttonYes.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if (editText.getText().toString().trim().length() > 0){
+                    mService.insertNote(editText.getText().toString(), content, notebooksId);
+                    dismiss();
+                } else {
+                    Context context = getActivity();
+                    CharSequence text = "Sorry, Mario, our princess is in another castle! =(";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                }
+            }
+        });
+        Button buttonNo = (Button)v.findViewById(R.id.btnNo);
+        buttonNo.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
         return v;
     }
 
     @Override
     public void onClick(View view) {
-        mService.insertNote(editText.getText().toString(), "content", notebooksId);
-        dismiss();
     }
 }

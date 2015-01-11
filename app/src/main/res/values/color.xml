@@ -5,4 +5,5 @@
     <color name="login_remember_color">#FFFFFF</color>
     <color name="login_text">#005e37</color>
     <color name="login_hint">#1a7e4d</color>
+    <color name="subtitle_color">#abe5bf</color>
 </resources>
