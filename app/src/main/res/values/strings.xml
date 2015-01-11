@@ -18,7 +18,7 @@
     <string name="menu_add_to_home_screen">Добавить на домашний экран</string>
     <string name="title_activity_main">Evernote</string>
     <string name="title_section1">Все заметки</string>
-    <string name="title_section2">Блокноты</string>
+    <string name="title_section2">Все блокноты</string>
     <string name="title_section3">Section 3</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -28,7 +28,7 @@
 
 
     <string-array name="drawer_items_views_names">
-        <item>Блокноты</item>
+        <item>Все блокноты</item>
         <item>Все заметки</item>
         <item>Третий экран</item>
     </string-array>

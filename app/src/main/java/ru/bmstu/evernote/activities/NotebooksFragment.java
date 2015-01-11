@@ -9,12 +9,15 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+
+import java.util.Arrays;
 
 import ru.bmstu.evernote.R;
 import ru.bmstu.evernote.provider.EvernoteContentProvider;
@@ -38,6 +41,11 @@ public class NotebooksFragment extends ListFragment implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         getLoaderManager().initLoader(0, null, this);
         mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.notebook_item, null, from, to, 0);
+        Log.e("", "@!(#*$^!&(*@^#$%)(!&@^#$(*&!@#^$(!*&#$^!(@#*&$");
+        Log.e("","!@$)(#*%&^!@(*&#^$!*(@#&$^(!@*#&$^(!#@*&$^!(*&");
+
+        Log.e("","@!(#*$^!&(*@^#$%)(!&@^#$(*&!@#^$(!*&#$^!(@#*&$");
+        Log.e("","!@$)(#*%&^!@(*&#^$!*(@#&$^(!@*#&$^(!#@*&$^!(*&");
         setListAdapter(mAdapter);
     }
 

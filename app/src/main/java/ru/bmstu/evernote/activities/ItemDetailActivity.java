@@ -67,14 +67,19 @@ public class ItemDetailActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.action_edit:
-                DialogFragment dialogFragment = new EditNoteDialog();
+                DialogFragment dialogFragment = new EditNotebookDialog();
                 Bundle bundle = new Bundle();
                 bundle.putLong(ItemDetailFragment.ARG_ITEM_ID, notesId);
                 dialogFragment.setArguments(bundle);
                 dialogFragment.show(getFragmentManager(), "Remove notebook dialog");
                 break;
             case R.id.action_discard:
-                new RemoveNoteDialog().show(getFragmentManager(), "Remove note dialog");
+//                new RemoveNotebookDialog().show(getFragmentManager(), "Remove notebook dialog");
+                DialogFragment dialogRemoveFragment = new RemoveNotebookDialog();
+                Bundle bundle1 = new Bundle();
+                bundle1.putLong(ItemDetailFragment.ARG_ITEM_ID, notesId);
+                dialogRemoveFragment.setArguments(bundle1);
+                dialogRemoveFragment.show(getFragmentManager(), "Remove notebook dialog");
                 break;
             default:
                 break;

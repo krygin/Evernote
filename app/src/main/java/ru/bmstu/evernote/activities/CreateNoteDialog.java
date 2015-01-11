@@ -71,7 +71,8 @@ public class CreateNoteDialog extends DialogFragment implements View.OnClickList
         Cursor cursor = getActivity().getContentResolver().query(
                 EvernoteContentProvider.NOTEBOOKS_URI,
                 NotebooksTable.DEFAULT_PROJECTION,
-                null, null, null);
+                NotebooksTable.NOT_DELETED_CONDITION,
+                null, null);
         SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_spinner_item, cursor, new String[]{NotebooksTable.NAME}, new int[]{android.R.id.text1}, 0);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner spinner = (Spinner)v.findViewById(R.id.spinner);
@@ -96,8 +97,6 @@ public class CreateNoteDialog extends DialogFragment implements View.OnClickList
         Log.e("","@!(#*$^!&(*@^#$%)(!&@^#$(*&!@#^$(!*&#$^!(@#*&$");
         Log.e("","!@$)(#*%&^!@(*&#^$!*(@#&$^(!@*#&$^(!#@*&$^!(*&");
         Log.e("",content);
-        Log.e("","@!(#*$^!&(*@^#$%)(!&@^#$(*&!@#^$(!*&#$^!(@#*&$");
-        Log.e("","!@$)(#*%&^!@(*&#^$!*(@#&$^(!@*#&$^(!#@*&$^!(*&");
         buttonYes.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (editText.getText().toString().trim().length() > 0){
