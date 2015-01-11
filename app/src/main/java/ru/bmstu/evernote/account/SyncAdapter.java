@@ -128,7 +128,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     databaseHelper.updateNotebook(name, usn, updated, notebooksId);
                     databaseHelper.deleteNotebookTransactionIfExistsAndNotDelete(notebooksId);
                     break;
-                case 2:
+                default:
                     throw new IllegalStateException();
             }
         }
@@ -154,14 +154,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             long notesId = 0;
             switch (count) {
                 case 0:
-                    notesId = databaseHelper.insertNote(title, guid, usn, created, updated, notebooksId);
+                    notesId = databaseHelper.insertNote(title, content, guid, usn, created, updated, notebooksId);
                     break;
                 case 1:
                     noteCursor.moveToFirst();
                     notesId = noteCursor.getLong(noteCursor.getColumnIndex(NotesTable._ID));
-                    databaseHelper.updateNote(title, usn, updated, notesId);
+                    databaseHelper.updateNote(title, content, usn, updated, notesId);
                     break;
-                case 2:
+                default:
                     throw new IllegalStateException();
             }
             FileProcessor fp = new FileProcessor(mContext);
