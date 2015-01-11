@@ -41,9 +41,10 @@ public class DatabaseHelper {
     }
 
 
-    public long insertNote(String title, String guid, long usn, long created, long updated, long notebooksId) throws RemoteException {
+    public long insertNote(String title, String content, String guid, long usn, long created, long updated, long notebooksId) throws RemoteException {
         ContentValues contentValues = new ContentValues();
         contentValues.put(NotesTable.TITLE, title);
+        contentValues.put(NotesTable.CONTENT, content);
         contentValues.put(NotesTable.GUID, guid);
         contentValues.put(NotesTable.USN, usn);
         contentValues.put(NotesTable.CREATED, created);
@@ -62,7 +63,7 @@ public class DatabaseHelper {
         contentValues.put(ResourcesTable.MIME_TYPE, mimeType);
         contentValues.put(ResourcesTable.NOTES_ID, notesId);
         contentValues.put(ResourcesTable.IS_LOCALLY_DELETED, 0);
-        Uri result = contentProviderClient.insert(EvernoteContentProvider.NOTES_URI, contentValues);
+        Uri result = contentProviderClient.insert(EvernoteContentProvider.RESOURCES_URI, contentValues);
         return Long.parseLong(result.getLastPathSegment());
     }
 
@@ -77,9 +78,10 @@ public class DatabaseHelper {
         return result != 0;
     }
 
-    public boolean updateNote(String title, long usn, long updated, long notesId) throws RemoteException {
+    public boolean updateNote(String title, String content, long usn, long updated, long notesId) throws RemoteException {
         ContentValues values = new ContentValues();
         values.put(NotesTable.TITLE, title);
+        values.put(NotesTable.CONTENT, content);
         values.put(NotesTable.USN, usn);
         values.put(NotesTable.UPDATED, updated);
         Uri notesUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTES_URI, notesId);
