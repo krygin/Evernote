@@ -61,9 +61,9 @@ public class ContentProviderHelperService extends Service implements IClientAPI 
     }
 
     @Override
-    public boolean insertResource(long notesId, String resource) {
+    public boolean insertResource(long notesId, String filename) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(ResourcesTable.PATH_TO_RESOURCE, resource);
+        contentValues.put(ResourcesTable.FILENAME, filename);
         contentValues.put(ResourcesTable.MIME_TYPE, Constants.EDAM_MIME_TYPE_DEFAULT);
         contentValues.put(ResourcesTable.NOTES_ID, notesId);
         contentValues.put(ResourcesTable.IS_LOCALLY_DELETED, 0);
@@ -83,11 +83,12 @@ public class ContentProviderHelperService extends Service implements IClientAPI 
     }
 
     @Override
-    public boolean updateNote(String title, long notebooksId) {
+    public boolean updateNote(String title, String content, long notebooksId) {
         ContentValues values = new ContentValues();
         Long currentTime = new Date().getTime();
         values.put(NotesTable.TITLE, title);
         values.put(NotesTable.UPDATED, currentTime);
+        values.put(NotesTable.CONTENT, content);
         Uri notesUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTES_URI_TRANSACT, notebooksId);
         int result = getContentResolver().update(notesUri, values, null, null);
         return result != 0;

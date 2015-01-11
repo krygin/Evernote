@@ -9,7 +9,7 @@ public interface IClientAPI {
     boolean insertNote(String title, String content, long notebooksId);
     boolean insertResource(long notesId, String resource);
     boolean updateNotebook(long notebooksId, String name);
-    boolean updateNote(String name, long notesId);
+    boolean updateNote(String title, String content, long notesId);
     boolean deleteNote(long notesId);
     boolean deleteNotebook(long notebooksId);
     boolean deleteResource(long resourceId);
