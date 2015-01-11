@@ -10,7 +10,6 @@ public interface ResourcesTable extends BaseColumns {
 
     String MIME_TYPE = "mime_type";
     String FILENAME = "filename";
-    String PATH_TO_RESOURCE = "path_to_resource";
     String GUID = "guid";
     String NOTES_ID = "notes_id";
 
@@ -19,7 +18,6 @@ public interface ResourcesTable extends BaseColumns {
     String[] ALL_COLUMNS = new String[]{_ID, GUID, MIME_TYPE, FILENAME, NOTES_ID};
     String SQL_CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
             _ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
-            PATH_TO_RESOURCE + " TEXT NOT NULL" + "," +
             GUID + " TEXT UNIQUE" + "," +
             MIME_TYPE + " TEXT NOT NULL" + "," +
             FILENAME + " TEXT" + "," +
@@ -27,8 +25,6 @@ public interface ResourcesTable extends BaseColumns {
             NOTES_ID + " INTEGER NOT NULL" + " REFERENCES " + NotesTable.TABLE_NAME + " (" + NotesTable._ID + ")" + " ON DELETE CASCADE" +
             ")";
 
-    String[] DEFAULT_PROJECTION = new String[]{_ID, MIME_TYPE, PATH_TO_RESOURCE};
-    String[] TEST_PROJECTION = new String[]{_ID, GUID, MIME_TYPE, PATH_TO_RESOURCE, NOTES_ID};
 
     String SQL_DROP = "DROP TABLE IF EXISTS " + TABLE_NAME;
 

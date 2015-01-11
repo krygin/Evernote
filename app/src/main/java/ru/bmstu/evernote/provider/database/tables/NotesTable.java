@@ -20,7 +20,7 @@ public interface NotesTable extends BaseColumns {
     String[] ALL_COLUMNS = new String[]{_ID, TITLE, GUID, CREATED, UPDATED, USN, NOTEBOOKS_ID};
     String SQL_CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
             _ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
-            TITLE + " TEXT UNIQUE NOT NULL" + "," +
+            TITLE + " TEXT" + "," +
             GUID + " TEXT" + "," +
             CONTENT + " TEXT" + "," +
             CREATED + " NUMERIC NOT NULL" + "," +
