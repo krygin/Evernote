@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,9 @@ import ru.bmstu.evernote.provider.database.tables.NotebooksTable;
  */
 public class NotebooksFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private CursorAdapter mAdapter;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+
+    private Object mStatusChangeListener;
 
     private final String[] from = new String[]{NotebooksTable._ID, NotebooksTable.NAME, NotebooksTable.GUID, NotebooksTable.CREATED, NotebooksTable.UPDATED, NotebooksTable.USN};
     private final int[] to = new int[]{R.id.id, R.id.name, R.id.guid, R.id.created, R.id.updated, R.id.usn };
@@ -61,8 +65,6 @@ public class NotebooksFragment extends ListFragment implements LoaderManager.Loa
         startActivity(intent);
     }
 
-
-
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(
@@ -83,4 +85,5 @@ public class NotebooksFragment extends ListFragment implements LoaderManager.Loa
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         mAdapter.swapCursor(null);
     }
+
 }

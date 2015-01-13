@@ -1,22 +1,16 @@
 package ru.bmstu.evernote.activities;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SyncStatusObserver;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,22 +19,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import ru.bmstu.evernote.R;
-import ru.bmstu.evernote.account.EvernoteAccount;
-import ru.bmstu.evernote.account.LoginActivity;
-import ru.bmstu.evernote.provider.EvernoteContentProvider;
 
-public class MainActivity extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener, SyncStatusObserver {
+public class MainActivity extends ActionBarActivity {
     private static final String LOGTAG = MainActivity.class.getSimpleName();
 
     private DrawerLayout mDrawerLayout;
     private ListView mListView;
     private ActionBarDrawerToggle mActionBarToggle;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+
 
 
     private String[] mDrawerItemsViewsNames;
 
-    private Object mStatusChangeListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,24 +53,12 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 
         mListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1, android.R.id.text1, mDrawerItemsViewsNames));
         mListView.setOnItemClickListener(new DrawerItemClickListener());
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.content_frame);
-
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-        mStatusChangeListener = ContentResolver.addStatusChangeListener(ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE, this);
         displayView(0);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mSwipeRefreshLayout.setOnRefreshListener(null);
-        ContentResolver.removeStatusChangeListener(mStatusChangeListener);
     }
 
     @Override
@@ -96,27 +74,6 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
         ((Activity) ctx).finish();
     }
 
-    @Override
-    public void onStatusChanged(int i) {
-
-        mSwipeRefreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                AccountManager accountManager = AccountManager.get(MainActivity.this);
-                Account[] accounts = accountManager.getAccountsByType(EvernoteAccount.TYPE);
-                if (accounts.length == 0) {
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    MainActivity.this.finish();
-                } else {
-                    Account account = accounts[0];
-                    mSwipeRefreshLayout.setRefreshing(ContentResolver.isSyncActive(account, EvernoteContentProvider.AUTHORITY));
-                }
-            }
-        });
-
-        Log.d(LOGTAG, Thread.currentThread().getName());
-    }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -181,19 +138,5 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mActionBarToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public void onRefresh() {
-        AccountManager accountManager = AccountManager.get(this);
-        Account[] accounts = accountManager.getAccountsByType(EvernoteAccount.TYPE);
-        if (accounts.length == 0) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-            this.finish();
-        } else {
-            Account account = accounts[0];
-            ContentResolver.requestSync(account, EvernoteContentProvider.AUTHORITY, new Bundle());
-        }
     }
 }
