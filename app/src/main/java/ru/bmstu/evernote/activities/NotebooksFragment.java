@@ -17,8 +17,6 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-import java.util.Arrays;
-
 import ru.bmstu.evernote.R;
 import ru.bmstu.evernote.provider.EvernoteContentProvider;
 import ru.bmstu.evernote.provider.database.tables.NotebooksTable;

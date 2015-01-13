@@ -44,7 +44,8 @@ public class SplashScreen extends Activity {
                     @Override
                     public void run(AccountManagerFuture<Bundle> future) {
                         try {
-                            future.getResult();
+                            Bundle bundle = future.getResult();
+                            //Account account = (Account)future.getResult().getParcelableArray();
                             try {
                                 MainActivity.startMainActivity(mContext);
                             } catch (Exception e) {
