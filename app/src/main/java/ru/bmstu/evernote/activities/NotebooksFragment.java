@@ -43,11 +43,6 @@ public class NotebooksFragment extends ListFragment implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         getLoaderManager().initLoader(0, null, this);
         mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.notebook_item, null, from, to, 0);
-        Log.e("", "@!(#*$^!&(*@^#$%)(!&@^#$(*&!@#^$(!*&#$^!(@#*&$");
-        Log.e("","!@$)(#*%&^!@(*&#^$!*(@#&$^(!@*#&$^(!#@*&$^!(*&");
-
-        Log.e("","@!(#*$^!&(*@^#$%)(!&@^#$(*&!@#^$(!*&#$^!(@#*&$");
-        Log.e("","!@$)(#*%&^!@(*&#^$!*(@#&$^(!@*#&$^(!#@*&$^!(*&");
         setListAdapter(mAdapter);
     }
 

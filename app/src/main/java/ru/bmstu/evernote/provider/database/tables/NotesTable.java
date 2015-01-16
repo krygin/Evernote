@@ -17,7 +17,7 @@ public interface NotesTable extends BaseColumns {
     String NOTEBOOKS_ID = "notebooks_id";
     String IS_LOCALLY_DELETED = "is_locally_deleted";
 
-    String[] ALL_COLUMNS = new String[]{_ID, TITLE, GUID, CREATED, UPDATED, USN, NOTEBOOKS_ID};
+    String[] ALL_COLUMNS = new String[]{_ID, TITLE, CONTENT, GUID, CREATED, UPDATED, USN, NOTEBOOKS_ID};
     String SQL_CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
             _ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
             TITLE + " TEXT" + "," +
