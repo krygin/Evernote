@@ -19,8 +19,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import ru.bmstu.evernote.R;
-import ru.bmstu.evernote.provider.EvernoteContentProvider;
-import ru.bmstu.evernote.provider.database.tables.NotebooksTable;
+import ru.bmstu.evernote.provider.database.EvernoteContract.Notebooks;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,8 +30,8 @@ public class NotebooksFragment extends ListFragment implements LoaderManager.Loa
 
     private Object mStatusChangeListener;
 
-    private final String[] from = new String[]{NotebooksTable._ID, NotebooksTable.NAME, NotebooksTable.GUID, NotebooksTable.CREATED, NotebooksTable.UPDATED, NotebooksTable.USN};
-    private final int[] to = new int[]{R.id.id, R.id.name, R.id.guid, R.id.created, R.id.updated, R.id.usn };
+    private final String[] from = new String[]{Notebooks._ID, Notebooks.NAME, Notebooks.GUID, Notebooks.CREATED, Notebooks.UPDATED, Notebooks.USN, Notebooks.STATE_SYNC_REQUIRED, Notebooks.STATE_DELETED};
+    private final int[] to = new int[]{R.id.id, R.id.name, R.id.guid, R.id.created, R.id.updated, R.id.usn, R.id.sync_required, R.id.deleted };
 
     public NotebooksFragment() {
         // Required empty public constructor
@@ -69,9 +68,9 @@ public class NotebooksFragment extends ListFragment implements LoaderManager.Loa
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(
                 getActivity(),
-                EvernoteContentProvider.NOTEBOOKS_URI,
-                NotebooksTable.ALL_COLUMNS,
-                NotebooksTable.NOT_DELETED_CONDITION,
+                Notebooks.CONTENT_URI,
+                Notebooks.ALL_COLUMNS_PROJECTION,
+                Notebooks.NOT_DELETED_SELECTION,
                 null,
                 null);
     }

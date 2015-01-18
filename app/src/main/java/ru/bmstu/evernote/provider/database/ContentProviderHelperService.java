@@ -12,10 +12,11 @@ import com.evernote.edam.limits.Constants;
 
 import java.util.Date;
 
-import ru.bmstu.evernote.provider.EvernoteContentProvider;
-import ru.bmstu.evernote.provider.database.tables.NotebooksTable;
-import ru.bmstu.evernote.provider.database.tables.NotesTable;
-import ru.bmstu.evernote.provider.database.tables.ResourcesTable;
+import static ru.bmstu.evernote.provider.database.EvernoteContract.Notebooks;
+import static ru.bmstu.evernote.provider.database.EvernoteContract.Notes;
+import static ru.bmstu.evernote.provider.database.EvernoteContract.Resources;
+import static ru.bmstu.evernote.provider.database.EvernoteContract.StateDeleted;
+import static ru.bmstu.evernote.provider.database.EvernoteContract.StateSyncRequired;
 
 public class ContentProviderHelperService extends Service implements IClientAPI {
     private final IBinder mBinder = new ContentProviderHelperBinder();
@@ -38,11 +39,12 @@ public class ContentProviderHelperService extends Service implements IClientAPI 
     public boolean insertNotebook(String name) {
         ContentValues contentValues = new ContentValues();
         Long currentTime = new Date().getTime();
-        contentValues.put(NotebooksTable.NAME, name);
-        contentValues.put(NotebooksTable.CREATED, currentTime);
-        contentValues.put(NotebooksTable.UPDATED, currentTime);
-        contentValues.put(NotebooksTable.IS_LOCALLY_DELETED, 0);
-        Uri result = getContentResolver().insert(EvernoteContentProvider.NOTEBOOKS_URI_TRANSACT, contentValues);
+        contentValues.put(Notebooks.NAME, name);
+        contentValues.put(Notebooks.CREATED, currentTime);
+        contentValues.put(Notebooks.UPDATED, currentTime);
+        contentValues.put(Notebooks.STATE_DELETED, StateDeleted.FALSE.ordinal());
+        contentValues.put(Notebooks.STATE_SYNC_REQUIRED, StateSyncRequired.PENDING.ordinal());
+        Uri result = getContentResolver().insert(Notebooks.CONTENT_URI, contentValues);
         return result != null;
     }
 
@@ -50,68 +52,72 @@ public class ContentProviderHelperService extends Service implements IClientAPI 
     public boolean insertNote(String title, String content, long notebooksId) {
         ContentValues contentValues = new ContentValues();
         Long currentTime = new Date().getTime();
-        contentValues.put(NotesTable.TITLE, title);
-        contentValues.put(NotesTable.CREATED, currentTime);
-        contentValues.put(NotesTable.UPDATED, currentTime);
-        contentValues.put(NotesTable.NOTEBOOKS_ID, notebooksId);
-        contentValues.put(NotesTable.IS_LOCALLY_DELETED, 0);
-        contentValues.put(NotesTable.CONTENT, content);
-        Uri result = getContentResolver().insert(EvernoteContentProvider.NOTES_URI_TRANSACT, contentValues);
+        contentValues.put(Notes.TITLE, title);
+        contentValues.put(Notes.CONTENT, content);
+        contentValues.put(Notes.CREATED, currentTime);
+        contentValues.put(Notes.UPDATED, currentTime);
+        contentValues.put(Notes.NOTEBOOKS_ID, notebooksId);
+        contentValues.put(Notes.STATE_DELETED, StateDeleted.FALSE.ordinal());
+        contentValues.put(Resources.STATE_SYNC_REQUIRED, StateSyncRequired.PENDING.ordinal());
+        Uri result = getContentResolver().insert(Notes.CONTENT_URI, contentValues);
         return result != null;
     }
 
     @Override
     public boolean insertResource(long notesId, String filename) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(ResourcesTable.FILENAME, filename);
-        contentValues.put(ResourcesTable.MIME_TYPE, Constants.EDAM_MIME_TYPE_DEFAULT);
-        contentValues.put(ResourcesTable.NOTES_ID, notesId);
-        contentValues.put(ResourcesTable.IS_LOCALLY_DELETED, 0);
-        Uri result = getContentResolver().insert(EvernoteContentProvider.RESOURCES_URI_TRANSACT, contentValues);
+        contentValues.put(Resources.FILENAME, filename);
+        contentValues.put(Resources.MIME_TYPE, Constants.EDAM_MIME_TYPE_DEFAULT);
+        contentValues.put(Resources.NOTES_ID, notesId);
+        contentValues.put(Resources.STATE_DELETED, StateDeleted.FALSE.ordinal());
+        contentValues.put(Resources.STATE_SYNC_REQUIRED, StateSyncRequired.PENDING.ordinal());
+        Uri result = getContentResolver().insert(Resources.CONTENT_URI, contentValues);
         return result != null;
     }
 
     @Override
     public boolean updateNotebook(long notebooksId, String name) {
-        ContentValues values = new ContentValues();
+        ContentValues contentValues = new ContentValues();
         Long currentTime = new Date().getTime();
-        values.put(NotebooksTable.NAME, name);
-        values.put(NotebooksTable.UPDATED, currentTime);
-        Uri notebookUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTEBOOKS_URI_TRANSACT, notebooksId);
-        int result = getContentResolver().update(notebookUri, values, null, null);
+        contentValues.put(Notebooks.NAME, name);
+        contentValues.put(Notebooks.UPDATED, currentTime);
+        contentValues.put(Notebooks.STATE_SYNC_REQUIRED, StateSyncRequired.PENDING.ordinal());
+        Uri notebookUri = ContentUris.withAppendedId(Notebooks.CONTENT_URI, notebooksId);
+        int result = getContentResolver().update(notebookUri, contentValues, null, null);
         return result != 0;
     }
 
     @Override
     public boolean updateNote(String title, String content, long notebooksId) {
-        ContentValues values = new ContentValues();
+        ContentValues contentValues = new ContentValues();
         Long currentTime = new Date().getTime();
-        values.put(NotesTable.TITLE, title);
-        values.put(NotesTable.UPDATED, currentTime);
-        values.put(NotesTable.CONTENT, content);
-        Uri notesUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTES_URI_TRANSACT, notebooksId);
-        int result = getContentResolver().update(notesUri, values, null, null);
+        contentValues.put(Notes.TITLE, title);
+        contentValues.put(Notes.CONTENT, content);
+        contentValues.put(Notes.UPDATED, currentTime);
+        contentValues.put(Notebooks.STATE_SYNC_REQUIRED, StateSyncRequired.PENDING.ordinal());
+        Uri notesUri = ContentUris.withAppendedId(Notes.CONTENT_URI, notebooksId);
+        int result = getContentResolver().update(notesUri, contentValues, null, null);
         return result != 0;
     }
 
 
     @Override
     public boolean deleteNotebook(long notebooksId) {
-        Uri notebookUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTEBOOKS_URI_TRANSACT, notebooksId);
+        Uri notebookUri = ContentUris.withAppendedId(Notebooks.CONTENT_URI, notebooksId);
         int result = getContentResolver().delete(notebookUri, null, null);
         return result != 0;
     }
 
     @Override
     public boolean deleteNote(long notesId) {
-        Uri notesUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTES_URI_TRANSACT, notesId);
+        Uri notesUri = ContentUris.withAppendedId(Notebooks.CONTENT_URI, notesId);
         int result = getContentResolver().delete(notesUri, null, null);
         return result != 0;
     }
 
     @Override
     public boolean deleteResource(long resourcesId) {
-        Uri resourcesUri = ContentUris.withAppendedId(EvernoteContentProvider.RESOURCES_URI_TRANSACT, resourcesId);
+        Uri resourcesUri = ContentUris.withAppendedId(Resources.CONTENT_URI, resourcesId);
         int result = getContentResolver().delete(resourcesUri, null, null);
         return result != 0;
     }

@@ -2,6 +2,7 @@ package ru.bmstu.evernote.activities;
 
 
 
+import android.app.Fragment;
 import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
@@ -9,7 +10,6 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,12 +18,9 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-import java.util.Arrays;
-
 import ru.bmstu.evernote.R;
-import ru.bmstu.evernote.provider.EvernoteContentProvider;
-import ru.bmstu.evernote.provider.database.tables.NotebooksTable;
-import ru.bmstu.evernote.provider.database.tables.NotesTable;
+
+import static ru.bmstu.evernote.provider.database.EvernoteContract.Notes;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -49,7 +46,7 @@ import ru.bmstu.evernote.provider.database.tables.NotesTable;
 public class NotesFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private CursorAdapter mAdapter;
 
-    private final String[] from = new String[]{NotesTable._ID, NotesTable.TITLE, NotesTable.GUID, NotesTable.CREATED, NotesTable.UPDATED, NotesTable.USN, NotesTable.NOTEBOOKS_ID};
+    private final String[] from = new String[]{Notes._ID, Notes.TITLE, Notes.GUID, Notes.CREATED, Notes.UPDATED, Notes.USN, Notes.NOTEBOOKS_ID};
     private final int[] to = new int[]{R.id.id, R.id.name, R.id.guid, R.id.created, R.id.updated, R.id.usn, R.id.notebook_id };
 
     public NotesFragment() {
@@ -87,9 +84,9 @@ public class NotesFragment extends ListFragment implements LoaderManager.LoaderC
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(
                 getActivity(),
-                EvernoteContentProvider.NOTES_URI,
-                NotesTable.ALL_COLUMNS,
-                NotesTable.NOT_DELETED_CONDITION,
+                Notes.CONTENT_URI,
+                Notes.ALL_COLUMNS_PROJECTION,
+                Notes.NOT_DELETED_SELECTION,
                 null,
                 null);
     }
@@ -97,6 +94,7 @@ public class NotesFragment extends ListFragment implements LoaderManager.LoaderC
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         mAdapter.swapCursor(cursor);
+
     }
 
     @Override

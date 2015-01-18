@@ -7,11 +7,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.RemoteException;
 
-import ru.bmstu.evernote.provider.EvernoteContentProvider;
-import ru.bmstu.evernote.provider.database.tables.NotebooksTable;
-import ru.bmstu.evernote.provider.database.tables.NotesTable;
-import ru.bmstu.evernote.provider.database.tables.ResourcesTable;
-import ru.bmstu.evernote.provider.database.tables.TransactionsTable;
+import java.util.Date;
+
+import static ru.bmstu.evernote.provider.database.EvernoteContract.Notebooks;
+import static ru.bmstu.evernote.provider.database.EvernoteContract.Notes;
+import static ru.bmstu.evernote.provider.database.EvernoteContract.Resources;
+import static ru.bmstu.evernote.provider.database.EvernoteContract.StateDeleted;
+import static ru.bmstu.evernote.provider.database.EvernoteContract.StateSyncRequired;
 
 /**
  * Created by Ivan on 23.12.2014.
@@ -23,146 +25,114 @@ public class DatabaseHelper {
         this.contentProviderClient = contentProviderClient;
     }
 
-    public boolean insertNotebook(String name, String guid, long usn, long created, long updated) throws RemoteException {
+    public Uri insertNotebook(String name, String guid, long created, long updated, long usn) throws RemoteException {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(NotebooksTable.NAME, name);
-        contentValues.put(NotebooksTable.GUID, guid);
-        contentValues.put(NotebooksTable.USN, usn);
-        contentValues.put(NotebooksTable.CREATED, created);
-        contentValues.put(NotebooksTable.UPDATED, updated);
-        contentValues.put(NotebooksTable.IS_LOCALLY_DELETED, 0);
-        Uri result = null;
-        try {
-            result = contentProviderClient.insert(EvernoteContentProvider.NOTEBOOKS_URI, contentValues);
-        } catch (Exception e) {
-            return false;
-        }
-        return result != null;
+        contentValues.put(Notebooks.NAME, name);
+        contentValues.put(Notebooks.GUID, guid);
+        contentValues.put(Notebooks.CREATED, created);
+        contentValues.put(Notebooks.UPDATED, updated);
+        contentValues.put(Notebooks.USN, usn);
+        contentValues.put(Notebooks.STATE_DELETED, StateDeleted.FALSE.ordinal());
+        contentValues.put(Notebooks.STATE_SYNC_REQUIRED, StateSyncRequired.SYNCED.ordinal());
+        return contentProviderClient.insert(Notebooks.CONTENT_URI, contentValues);
     }
 
-
-    public long insertNote(String title, String content, String guid, long usn, long created, long updated, long notebooksId) throws RemoteException {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(NotesTable.TITLE, title);
-        contentValues.put(NotesTable.CONTENT, content);
-        contentValues.put(NotesTable.GUID, guid);
-        contentValues.put(NotesTable.USN, usn);
-        contentValues.put(NotesTable.CREATED, created);
-        contentValues.put(NotesTable.UPDATED, updated);
-        contentValues.put(NotesTable.NOTEBOOKS_ID, notebooksId);
-        contentValues.put(NotesTable.IS_LOCALLY_DELETED, 0);
-        Uri result = contentProviderClient.insert(EvernoteContentProvider.NOTES_URI, contentValues);
-        return Long.parseLong(result.getLastPathSegment());
-    }
-
-
-    public long insertResource(String guid, String filename, String mimeType, long notesId) throws RemoteException {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(ResourcesTable.GUID, guid);
-        contentValues.put(ResourcesTable.FILENAME, filename);
-        contentValues.put(ResourcesTable.MIME_TYPE, mimeType);
-        contentValues.put(ResourcesTable.NOTES_ID, notesId);
-        contentValues.put(ResourcesTable.IS_LOCALLY_DELETED, 0);
-        Uri result = contentProviderClient.insert(EvernoteContentProvider.RESOURCES_URI, contentValues);
-        return Long.parseLong(result.getLastPathSegment());
-    }
-
-
-    public boolean updateNotebook(String name, long usn, long updated, long notebooksId) throws RemoteException {
-        ContentValues values = new ContentValues();
-        values.put(NotebooksTable.NAME, name);
-        values.put(NotebooksTable.USN, usn);
-        values.put(NotebooksTable.UPDATED, updated);
-        Uri notebookUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTEBOOKS_URI, notebooksId);
-        int result = contentProviderClient.update(notebookUri, values, null, null);
-        return result != 0;
-    }
-
-    public boolean updateNote(String title, String content, long usn, long updated, long notesId) throws RemoteException {
-        ContentValues values = new ContentValues();
-        values.put(NotesTable.TITLE, title);
-        values.put(NotesTable.CONTENT, content);
-        values.put(NotesTable.USN, usn);
-        values.put(NotesTable.UPDATED, updated);
-        Uri notesUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTES_URI, notesId);
-        int result = contentProviderClient.update(notesUri, values, null, null);
-        return result != 0;
-    }
-
-
-    public boolean deleteNotebookFromDatabase(long notebooksId) throws RemoteException {
-        Uri notebookUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTEBOOKS_URI, notebooksId);
-        int result = contentProviderClient.delete(notebookUri, null, null);
-        return result != 0;
-    }
-
-
-    public boolean deleteNoteFromDatabase(long notesId) throws RemoteException {
-        Uri noteUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTEBOOKS_URI, notesId);
-        int result = contentProviderClient.delete(noteUri, null, null);
-        return result != 0;
-    }
-
-
-    public boolean deleteResourceFromDatabase(long resourcesId) throws RemoteException {
-        Uri resourceUri = ContentUris.withAppendedId(EvernoteContentProvider.NOTEBOOKS_URI, resourcesId);
-        int result = contentProviderClient.delete(resourceUri, null, null);
-        return result != 0;
-    }
-
-    public boolean resolveNotebooksNamesConflict(String name) throws RemoteException {
-        int i = 2;
-        Cursor cursor = contentProviderClient.query(EvernoteContentProvider.NOTEBOOKS_URI, new String[]{NotebooksTable._ID},
-                NotebooksTable.NAME + "='" + name + "'", null, null);
-        if (cursor.getCount() != 1)
-            return false;
-        cursor.moveToFirst();
-        long id = cursor.getLong(cursor.getColumnIndex(NotebooksTable._ID));
-        Uri uri = ContentUris.withAppendedId(EvernoteContentProvider.NOTEBOOKS_URI, id);
-        while (true) {
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(NotebooksTable.NAME, name + "(" + i + ")");
-            try {
-                contentProviderClient.update(uri, contentValues, null, null);
+    public Uri insertNotebookWithConflictResolution(String name, String guid, long created, long updated, long usn) throws RemoteException {
+        Cursor cursor = getNotebookWithSpecifiedName(name);
+        int count = cursor.getCount();
+        switch (count) {
+            case 0:
                 break;
-            } catch (Exception ignored) {
-                i++;
-            }
+            case 1:
+                int i = 2;
+                while (getNotebookWithSpecifiedName(name + "(" + i + ")").getCount() != 0)
+                    i++;
+                cursor.moveToNext();
+                long id = cursor.getLong(cursor.getColumnIndex(Notebooks._ID));
+                String newName = name + "(" + i + ")";
+                Uri notebooksUri = ContentUris.withAppendedId(Notebooks.CONTENT_URI, id);
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(Notebooks.NAME, newName);
+                contentValues.put(Notebooks.STATE_SYNC_REQUIRED, StateSyncRequired.PENDING.ordinal());
+                contentValues.put(Notebooks.UPDATED, new Date().getTime());
+                contentProviderClient.update(notebooksUri, contentValues, null, null);
+                break;
+            default:
+                throw new IllegalStateException();
         }
-        return true;
+        return insertNotebook(name, guid, created, updated, usn);
     }
 
-
-    public Cursor getNotebookByGuid(String guid) throws RemoteException {
-        Cursor cursor = contentProviderClient.query(EvernoteContentProvider.NOTEBOOKS_URI, NotebooksTable.ALL_COLUMNS,
-                NotebooksTable.GUID + "='" + guid + "'", null, null);
-        return cursor;
+    public void updateNotebook(String name, long updated, long usn, long notebooksId) throws RemoteException {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Notebooks.NAME, name);
+        contentValues.put(Notebooks.UPDATED, updated);
+        contentValues.put(Notebooks.USN, usn);
+        contentValues.put(Notebooks.STATE_SYNC_REQUIRED, StateSyncRequired.SYNCED.ordinal());
+        Uri notebooksUri = ContentUris.withAppendedId(Notebooks.CONTENT_URI, notebooksId);
+        contentProviderClient.update(notebooksUri, contentValues, null, null);
     }
 
-    public boolean deleteNotebookTransactionIfExistsAndNotDelete(long notebooksId) throws RemoteException {
-        int deleted = 0;
-        Cursor notebookInTransactionsTable = contentProviderClient.query(EvernoteContentProvider.TRANSACTION_URI, TransactionsTable.ALL_COLUMNS,
-                TransactionsTable.TYPE + "=" + TransactionsTable.Type.NOTEBOOK.ordinal() + " AND " + TransactionsTable.ID + "=" + TransactionsTable.ID + "=" + notebooksId, null, null);
-        if (notebookInTransactionsTable.getCount() > 0) {
-            notebookInTransactionsTable.moveToFirst();
-            if (TransactionsTable.Method.values()[notebookInTransactionsTable.getInt(notebookInTransactionsTable.getColumnIndex(TransactionsTable.METHOD))].equals(TransactionsTable.Method.CREATE_OR_UPDATE)) {
-                long transactionId = notebookInTransactionsTable.getLong(notebookInTransactionsTable.getColumnIndex(TransactionsTable._ID));
-                Uri transaction = ContentUris.withAppendedId(EvernoteContentProvider.TRANSACTION_URI, transactionId);
-                deleted = contentProviderClient.delete(transaction, null, null);
-            }
-        }
-        return deleted == 1;
+    public Cursor getNotebookWithSpecifiedGuid(String notebooksGuid) throws RemoteException {
+        return contentProviderClient.query(Notebooks.CONTENT_URI, Notebooks.ALL_COLUMNS_PROJECTION, Notebooks.WITH_SPECIFIED_GUID_SELECTION, new String[]{notebooksGuid}, null);
     }
 
-    public Cursor getResourceByGuid(String guid) throws RemoteException {
-        Cursor cursor = contentProviderClient.query(EvernoteContentProvider.RESOURCES_URI, ResourcesTable.ALL_COLUMNS,
-                ResourcesTable.GUID + "='" + guid + "'", null, null);
-        return cursor;
+    public Cursor getNotebookWithSpecifiedName(String name) throws RemoteException {
+        return contentProviderClient.query(Notebooks.CONTENT_URI, Notebooks.ALL_COLUMNS_PROJECTION, Notebooks.WITH_SPECIFIED_NAME_SELECTION, new String[]{name}, null);
     }
 
-    public Cursor getNoteByGuid(String guid) throws RemoteException {
-        Cursor cursor = contentProviderClient.query(EvernoteContentProvider.NOTES_URI, NotesTable.ALL_COLUMNS,
-                NotesTable.GUID + "='" + guid + "'", null, null);
-        return cursor;
+    public Cursor getNoteWithSpecifiedGuid(String notesGuid) throws RemoteException {
+        return contentProviderClient.query(Notes.CONTENT_URI, Notes.ALL_COLUMNS_PROJECTION, Notes.WITH_SPECIFIED_GUID_SELECTION, new String[]{notesGuid}, null);
+    }
+
+    public int deleteNotebookWithSpecifiedGuid(String guid) throws RemoteException {
+        return contentProviderClient.delete(Notebooks.CONTENT_URI, Notebooks.WITH_SPECIFIED_GUID_SELECTION, new String[] {guid});
+    }
+
+    public Cursor getResourcesWithSpecifiedNotesId(long notesId) throws RemoteException {
+        return contentProviderClient.query(Resources.CONTENT_URI, Resources.ALL_COLUMNS_PROJECTION, Resources.WITH_SPECIFIED_NOTES_ID_SELECTION, new String[]{((Long)notesId).toString()}, null);
+    }
+
+    public int deleteNote(long notesId) throws RemoteException {
+        Uri notesUri = ContentUris.withAppendedId(Notes.CONTENT_URI, notesId);
+        return contentProviderClient.delete(notesUri, null, null);
+    }
+
+    public Cursor getDeletedNotebooks() throws RemoteException {
+        return contentProviderClient.query(Notebooks.CONTENT_URI, Notebooks.ALL_COLUMNS_PROJECTION, Notebooks.DELETED_SELECTION, null, null);
+    }
+
+    public Cursor getNotesWithSpecifiedNotebooksId(long notebooksId) throws RemoteException {
+        return contentProviderClient.query(Notes.CONTENT_URI, Notes.ALL_COLUMNS_PROJECTION, Notes.WITH_SPECIFIED_NOTEBOOKS_ID_SELECTION, new String[]{((Long)notebooksId).toString()},null);
+    }
+
+    public int deleteNotebook(long notebooksId) throws RemoteException {
+        Uri notebooksUri = ContentUris.withAppendedId(Notebooks.CONTENT_URI, notebooksId);
+        return contentProviderClient.delete(notebooksUri, null, null);
+    }
+
+    public Cursor getChangedNotebooks() throws RemoteException {
+        return contentProviderClient.query(Notebooks.CONTENT_URI, Notebooks.ALL_COLUMNS_PROJECTION, Notebooks.NOT_SYNCED_SELECTION, null, null);
+    }
+
+    public void updateNotebook(String guid, String name, long created, long updated, long usn, long id) throws RemoteException {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Notebooks.NAME, name);
+        contentValues.put(Notebooks.GUID, guid);
+        contentValues.put(Notebooks.CREATED, created);
+        contentValues.put(Notebooks.UPDATED, updated);
+        contentValues.put(Notebooks.USN, usn);
+        contentValues.put(Notebooks.STATE_SYNC_REQUIRED, StateSyncRequired.SYNCED.ordinal());
+        Uri notebooksUri = ContentUris.withAppendedId(Notebooks.CONTENT_URI, id);
+        contentProviderClient.update(notebooksUri, contentValues, null, null);
+
+    }
+
+    public void updateNotebook(long usn, long id) throws RemoteException {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Notebooks.USN, usn);
+        contentValues.put(Notebooks.STATE_SYNC_REQUIRED, StateSyncRequired.SYNCED.ordinal());
+        Uri notebooksUri = ContentUris.withAppendedId(Notebooks.CONTENT_URI, id);
+        contentProviderClient.update(notebooksUri, contentValues, null, null);
     }
 }

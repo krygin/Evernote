@@ -21,10 +21,10 @@ import android.widget.Toast;
 
 import ru.bmstu.evernote.EvernoteUtil;
 import ru.bmstu.evernote.R;
-import ru.bmstu.evernote.provider.EvernoteContentProvider;
 import ru.bmstu.evernote.provider.database.ContentProviderHelperService;
 import ru.bmstu.evernote.provider.database.IClientAPI;
-import ru.bmstu.evernote.provider.database.tables.NotebooksTable;
+
+import static ru.bmstu.evernote.provider.database.EvernoteContract.Notebooks;
 
 /**
  * Created by Sun on 27.12.2014.
@@ -69,11 +69,11 @@ public class CreateNoteDialog extends DialogFragment implements View.OnClickList
         View v = inflater.inflate(R.layout.create_note_dialog, container);
         //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data);
         Cursor cursor = getActivity().getContentResolver().query(
-                EvernoteContentProvider.NOTEBOOKS_URI,
-                NotebooksTable.DEFAULT_PROJECTION,
-                NotebooksTable.NOT_DELETED_CONDITION,
+                Notebooks.CONTENT_URI,
+                Notebooks.ALL_COLUMNS_PROJECTION,
+                Notebooks.NOT_DELETED_SELECTION,
                 null, null);
-        SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_spinner_item, cursor, new String[]{NotebooksTable.NAME}, new int[]{android.R.id.text1}, 0);
+        SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_spinner_item, cursor, new String[]{Notebooks.NAME}, new int[]{android.R.id.text1}, 0);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner spinner = (Spinner)v.findViewById(R.id.spinner);
         spinner.setAdapter(spinnerAdapter);
@@ -81,13 +81,13 @@ public class CreateNoteDialog extends DialogFragment implements View.OnClickList
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 Cursor c = (Cursor)adapterView.getItemAtPosition(i);
-                notebooksId = c.getLong(c.getColumnIndex(NotebooksTable._ID));
+                notebooksId = c.getLong(c.getColumnIndex(Notebooks._ID));
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
                 Cursor c = (Cursor)adapterView.getItemAtPosition(0);
-                notebooksId = c.getLong(c.getColumnIndex(NotebooksTable._ID));
+                notebooksId = c.getLong(c.getColumnIndex(Notebooks._ID));
             }
         });
         v.findViewById(R.id.btnYes).setOnClickListener(this);
