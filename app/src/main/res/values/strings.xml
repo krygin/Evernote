@@ -28,10 +28,18 @@
 
 
     <string-array name="drawer_items_views_names">
-        <item>Все блокноты</item>
-        <item>Все заметки</item>
-        <item>Третий экран</item>
+        <item>Заметки</item>
+        <item>Блокноты</item>
+        <item>TEST TRANSACTIONS</item>
     </string-array>
+    <array name="nav_drawer_icons">
+        <item>@drawable/ic_drawer_notes</item>
+        <item>@drawable/ic_drawer_notebooks</item>
+        <item>@drawable/ic_drawer_white_notebooks</item>
+    </array>
+
+    <string name="desc_list_item_icon">Item Icon</string>
+
     <string name="menu">Меню</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>

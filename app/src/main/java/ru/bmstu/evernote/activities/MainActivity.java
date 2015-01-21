@@ -100,7 +100,6 @@ public class MainActivity extends ActionBarActivity {
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.content_frame, fragment).commit();
-
             // update selected item and title, then close the drawer
             mListView.setItemChecked(position, true);
             mListView.setSelection(position);
