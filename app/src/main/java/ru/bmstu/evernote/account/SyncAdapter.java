@@ -21,6 +21,9 @@ import com.evernote.edam.type.Note;
 import com.evernote.edam.type.Notebook;
 import com.evernote.thrift.TException;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 import java.util.List;
 
 import ru.bmstu.evernote.EvernoteUtil;
@@ -34,11 +37,8 @@ import static ru.bmstu.evernote.provider.database.EvernoteContract.Notes;
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private DatabaseHelper databaseHelper;
     private NoteStore.Client noteStoreClient;
-    private Context context;
-
     public SyncAdapter(Context context) {
         super(context, true);
-        this.context = context;
     }
 
 
@@ -68,7 +68,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    private void fullSync(String authToken, long updateCount) throws TException, EDAMUserException, EDAMSystemException, RemoteException, EDAMNotFoundException {
+    private void fullSync(String authToken, long updateCount) throws TException, EDAMUserException, EDAMSystemException, RemoteException, EDAMNotFoundException, XmlPullParserException, IOException {
         int afterUSN = 0;
         int maxEntries = 10;
         SyncChunkFilter filter = new SyncChunkFilter();
@@ -87,7 +87,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         sendChanges(authToken);
     }
 
-    private void processSyncChunk(SyncChunk syncChunk, String authToken) throws RemoteException, EDAMUserException, EDAMSystemException, TException, EDAMNotFoundException {
+    private void processSyncChunk(SyncChunk syncChunk, String authToken) throws RemoteException, EDAMUserException, EDAMSystemException, TException, EDAMNotFoundException, XmlPullParserException, IOException {
         List<String> expungedNotebooks = syncChunk.getExpungedNotebooks();
         List<String> expungedNotes = syncChunk.getExpungedNotes();
         List<Notebook> notebooks = syncChunk.getNotebooks();
@@ -149,7 +149,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                             Cursor notebooksCursor = databaseHelper.getNotebookWithSpecifiedGuid(notebooksGuid);
                             notebooksCursor.moveToFirst();
                             long notebooksId = notebooksCursor.getLong(notebooksCursor.getColumnIndex(Notebooks._ID));
-                            databaseHelper.insertNote(title, content, guid, created, updated, usn, notebooksId);
+                            databaseHelper.insertNote(guid, title, content, created, updated, usn, notebooksId);
                             break;
                         case 1:
                             notesCursor.moveToFirst();
@@ -170,7 +170,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     }
 
-    private void sendChanges(String authToken) throws RemoteException, EDAMUserException, EDAMSystemException, EDAMNotFoundException, TException {
+    private void sendChanges(String authToken) throws RemoteException, EDAMUserException, EDAMSystemException, EDAMNotFoundException, TException, IOException, XmlPullParserException {
         databaseHelper.deleteNotes();
         databaseHelper.deleteNotebooks();
 
@@ -178,7 +178,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         sendNotes(authToken);
     }
 
-    private void sendNotes(String authToken) throws RemoteException, EDAMUserException, EDAMSystemException, TException, EDAMNotFoundException {
+    private void sendNotes(String authToken) throws RemoteException, EDAMUserException, EDAMSystemException, TException, EDAMNotFoundException, IOException, XmlPullParserException {
         Cursor notes = databaseHelper.getChangedNotes();
         while (notes.moveToNext()) {
             long id = notes.getLong(notes.getColumnIndex(Notes._ID));
@@ -190,24 +190,34 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             Cursor notebook = databaseHelper.getNotebook(notebooksId);
             notebook.moveToFirst();
             String notebooksGuid = notebook.getString(notebook.getColumnIndex(Notebooks.GUID));
+            StringBuilder resultContent = new StringBuilder();
+            String[] lines = content.split("\n");
+            for (String line: lines) {
+                resultContent.append("<div>").append(line).append("</div>");
+            }
             Note note = new Note();
             note.setNotebookGuid(notebooksGuid);
             note.setTitle(title);
-            note.setContent(EvernoteUtil.NOTE_PREFIX + content + EvernoteUtil.NOTE_SUFFIX);
+            note.setContent(EvernoteUtil.NOTE_PREFIX + resultContent + EvernoteUtil.NOTE_SUFFIX);
             note.setGuid(guid);
             Note serversNote;
+            String serversGuid;
+            long serversUSN;
+            long serversCreated;
+            long serversUpdated;
             if (usn == 0) {
                 serversNote = noteStoreClient.createNote(authToken, note);
+                serversGuid = serversNote.getGuid();
+                serversUSN = serversNote.getUpdateSequenceNum();
+                serversCreated = serversNote.getCreated();
+                serversUpdated = serversNote.getUpdated();
+                databaseHelper.updateNote(serversGuid, serversUSN, serversCreated, serversUpdated, id);
             } else {
                 serversNote = noteStoreClient.updateNote(authToken, note);
+                serversUpdated = serversNote.getUpdated();
+                serversUSN = serversNote.getUpdateSequenceNum();
+                databaseHelper.updateNote(serversUpdated, serversUSN, id);
             }
-            String serversGuid = serversNote.getGuid();
-            String serversTitle = serversNote.getTitle();
-            String serverContent = serversNote.getContent();
-            long serversUSN = serversNote.getUpdateSequenceNum();
-            long serversCreated = serversNote.getCreated();
-            long serversUpdated = serversNote.getUpdated();
-            databaseHelper.updateNote(serversGuid, serversTitle, serverContent, serversUpdated, serversCreated, serversUSN, id);
         }
     }
 

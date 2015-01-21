@@ -7,6 +7,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.RemoteException;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Date;
 
 import static ru.bmstu.evernote.provider.database.EvernoteContract.Notebooks;
@@ -88,24 +94,6 @@ public class DatabaseHelper {
         return contentProviderClient.delete(Notebooks.CONTENT_URI, Notebooks.WITH_SPECIFIED_GUID_SELECTION, new String[]{guid});
     }
 
-    public int deleteNote(long notesId) throws RemoteException {
-        Uri notesUri = ContentUris.withAppendedId(Notes.CONTENT_URI, notesId);
-        return contentProviderClient.delete(notesUri, null, null);
-    }
-
-    public Cursor getDeletedNotebooks() throws RemoteException {
-        return contentProviderClient.query(Notebooks.CONTENT_URI, Notebooks.ALL_COLUMNS_PROJECTION, Notebooks.DELETED_SELECTION, null, null);
-    }
-
-    public Cursor getNotesWithSpecifiedNotebooksId(long notebooksId) throws RemoteException {
-        return contentProviderClient.query(Notes.CONTENT_URI, Notes.ALL_COLUMNS_PROJECTION, Notes.WITH_SPECIFIED_NOTEBOOKS_ID_SELECTION, new String[]{((Long) notebooksId).toString()}, null);
-    }
-
-    public int deleteNotebook(long notebooksId) throws RemoteException {
-        Uri notebooksUri = ContentUris.withAppendedId(Notebooks.CONTENT_URI, notebooksId);
-        return contentProviderClient.delete(notebooksUri, null, null);
-    }
-
     public Cursor getChangedNotebooks() throws RemoteException {
         return contentProviderClient.query(Notebooks.CONTENT_URI, Notebooks.ALL_COLUMNS_PROJECTION, Notebooks.NOT_SYNCED_SELECTION, null, null);
     }
@@ -131,10 +119,45 @@ public class DatabaseHelper {
         contentProviderClient.update(notebooksUri, contentValues, null, null);
     }
 
-    public long insertNote(String title, String content, String guid, long created, long updated, long usn, long notebooksId) throws RemoteException {
+    public long insertNote(String guid, String title, String content, long created, long updated, long usn, long notebooksId) throws RemoteException, XmlPullParserException, IOException {
+        StringBuilder text = new StringBuilder();
+        boolean editable = true;
+        boolean divTagOpened = false;
+        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+        factory.setNamespaceAware(true);
+        XmlPullParser parser = factory.newPullParser();
+        parser.setInput(new StringReader(content));
+        while (parser.getEventType() != XmlPullParser.END_DOCUMENT) {
+            switch (parser.getEventType()) {
+                case XmlPullParser.START_DOCUMENT:
+                    break;
+                case XmlPullParser.START_TAG:
+                    if (parser.getName().equals("div"))
+                        divTagOpened = true;
+                    else if (parser.getName().equals("en-note"))
+                        break;
+                    else editable = false;
+                    break;
+                case XmlPullParser.TEXT:
+                    if (divTagOpened)
+                        text.append(parser.getText());
+                    break;
+                case XmlPullParser.END_TAG:
+                    if (parser.getName().equals("div")) {
+                        text.append("\n");
+                        divTagOpened = false;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            parser.next();
+        }
+        String strText = text.toString();
+        String resultString = editable&strText.trim().length()>0?text.toString():"Невозможно отобразить заметку";
         ContentValues contentValues = new ContentValues();
         contentValues.put(Notes.TITLE, title);
-        contentValues.put(Notes.CONTENT, content);
+        contentValues.put(Notes.CONTENT, resultString);
         contentValues.put(Notes.GUID, guid);
         contentValues.put(Notes.CREATED, created);
         contentValues.put(Notes.UPDATED, updated);
@@ -146,10 +169,45 @@ public class DatabaseHelper {
         return Long.parseLong(result.getLastPathSegment());
     }
 
-    public void updateNote(String title, String content, long updated, long usn, long notesId) throws RemoteException {
+    public void updateNote(String title, String content, long updated, long usn, long notesId) throws RemoteException, XmlPullParserException, IOException {
+        StringBuilder text = new StringBuilder();
+        boolean editable = true;
+        boolean divTagOpened = false;
+        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+        factory.setNamespaceAware(true);
+        XmlPullParser parser = factory.newPullParser();
+        parser.setInput(new StringReader(content));
+        while (parser.getEventType() != XmlPullParser.END_DOCUMENT) {
+            switch (parser.getEventType()) {
+                case XmlPullParser.START_DOCUMENT:
+                    break;
+                case XmlPullParser.START_TAG:
+                    if (parser.getName().equals("div"))
+                        divTagOpened = true;
+                    else if (parser.getName().equals("en-note"))
+                        break;
+                    else editable = false;
+                    break;
+                case XmlPullParser.TEXT:
+                    if (divTagOpened)
+                        text.append(parser.getText());
+                    break;
+                case XmlPullParser.END_TAG:
+                    if (parser.getName().equals("div")) {
+                        text.append("\n");
+                        divTagOpened = false;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            parser.next();
+        }
+        String strText = text.toString();
+        String resultString = editable&strText.trim().length()>0?text.toString():"Невозможно отобразить заметку";
         ContentValues contentValues = new ContentValues();
         contentValues.put(Notes.TITLE, title);
-        contentValues.put(Notes.CONTENT, content);
+        contentValues.put(Notes.CONTENT, resultString);
         contentValues.put(Notes.UPDATED, updated);
         contentValues.put(Notes.USN, usn);
         contentValues.put(Notes.STATE_SYNC_REQUIRED, StateSyncRequired.SYNCED.ordinal());
@@ -158,14 +216,7 @@ public class DatabaseHelper {
     }
 
 
-    public Cursor getDeletedNotes() throws RemoteException {
-        return contentProviderClient.query(Notes.CONTENT_URI, Notes.ALL_COLUMNS_PROJECTION, Notes.DELETED_SELECTION, null, null);
-    }
 
-    public Cursor getNote(long notesId) throws RemoteException {
-        Uri notesUri = ContentUris.withAppendedId(Notes.CONTENT_URI, notesId);
-        return contentProviderClient.query(notesUri, Notes.ALL_COLUMNS_PROJECTION, null, null, null);
-    }
 
     public Cursor getChangedNotes() throws RemoteException {
         return contentProviderClient.query(Notes.CONTENT_URI, Notes.ALL_COLUMNS_PROJECTION, Notes.NOT_SYNCED_SELECTION, null, null);
@@ -188,15 +239,21 @@ public class DatabaseHelper {
         return contentProviderClient.delete(Notebooks.CONTENT_URI, Notebooks.DELETED_SELECTION, null);
     }
 
-    public void updateNote(String guid, String title, String content, long updated, long created, long usn, long id) throws RemoteException {
+    public void updateNote(String guid, long usn, long created, long updated, long id) throws RemoteException {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Notes.GUID, guid);
-        contentValues.put(Notes.TITLE, title);
-        contentValues.put(Notes.CONTENT, content);
-        contentValues.put(Notes.UPDATED, updated);
-        contentValues.put(Notes.CREATED, created);
         contentValues.put(Notes.USN, usn);
-        contentValues.put(Notes.STATE_DELETED, StateDeleted.FALSE.ordinal());
+        contentValues.put(Notes.CREATED, created);
+        contentValues.put(Notes.UPDATED, updated);
+        contentValues.put(Notes.STATE_SYNC_REQUIRED, StateSyncRequired.SYNCED.ordinal());
+        Uri notesUri = ContentUris.withAppendedId(Notes.CONTENT_URI, id);
+        contentProviderClient.update(notesUri, contentValues, null, null);
+    }
+
+    public void updateNote(long updated, long usn, long id) throws RemoteException {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Notes.USN, usn);
+        contentValues.put(Notes.UPDATED, updated);
         contentValues.put(Notes.STATE_SYNC_REQUIRED, StateSyncRequired.SYNCED.ordinal());
         Uri notesUri = ContentUris.withAppendedId(Notes.CONTENT_URI, id);
         contentProviderClient.update(notesUri, contentValues, null, null);

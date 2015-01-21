@@ -19,7 +19,6 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import ru.bmstu.evernote.EvernoteUtil;
 import ru.bmstu.evernote.R;
 import ru.bmstu.evernote.provider.database.ContentProviderHelperService;
 import ru.bmstu.evernote.provider.database.IClientAPI;
@@ -61,7 +60,7 @@ public class CreateNoteDialog extends DialogFragment implements View.OnClickList
             getActivity().unbindService(serviceConnection);
         }
     }
-    String content = EvernoteUtil.NOTE_PREFIX + "Content of Note" + EvernoteUtil.NOTE_SUFFIX;
+    String content = "Content of Note";
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getDialog().setTitle("Добавить заметку");
