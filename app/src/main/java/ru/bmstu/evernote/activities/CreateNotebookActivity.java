@@ -21,7 +21,7 @@ import ru.bmstu.evernote.provider.database.IClientAPI;
 /**
  * Created by Admin on 21.01.2015.
  */
-public class CreateNoteActivity extends Activity implements View.OnClickListener {
+public class CreateNotebookActivity extends Activity implements View.OnClickListener {
 
     private IClientAPI mService = null;
     private EditText editText = null;

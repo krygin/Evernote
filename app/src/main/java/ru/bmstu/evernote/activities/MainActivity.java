@@ -15,14 +15,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import ru.bmstu.evernote.custom.list.view.NavDrawerItem;
 import ru.bmstu.evernote.custom.list.adapter.NavDrawerListAdapter;
 import java.util.ArrayList;
 import android.content.res.TypedArray;
-import android.util.Log;
 
 import ru.bmstu.evernote.R;
 
@@ -158,7 +156,7 @@ public class MainActivity extends ActionBarActivity {
             return true;
         switch (item.getItemId()) {
             case R.id.create_notebook:
-                Intent intent = new Intent(this, CreateNoteActivity.class);
+                Intent intent = new Intent(this, CreateNotebookActivity.class);
 //                intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, id);
                 startActivity(intent);
 //                new CreateNotebookDialog().show(getFragmentManager(), "Create notebook dialog");
