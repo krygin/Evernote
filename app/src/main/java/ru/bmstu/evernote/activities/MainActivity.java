@@ -18,6 +18,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import ru.bmstu.evernote.custom.list.view.NavDrawerItem;
+import ru.bmstu.evernote.custom.list.adapter.NavDrawerListAdapter;
+import java.util.ArrayList;
+import android.content.res.TypedArray;
+import android.util.Log;
+
 import ru.bmstu.evernote.R;
 
 public class MainActivity extends ActionBarActivity {
@@ -27,32 +33,73 @@ public class MainActivity extends ActionBarActivity {
     private ListView mListView;
     private ActionBarDrawerToggle mActionBarToggle;
 
-
-
     private String[] mDrawerItemsViewsNames;
 
+    // nav drawer title
+    private CharSequence mDrawerTitle;
+
+    // used to store app title
+    private CharSequence mTitle;
+
+    // slide menu items
+    private TypedArray navMenuIcons;
+
+    private ArrayList<NavDrawerItem> navDrawerItems;
+    private NavDrawerListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mTitle = mDrawerTitle = getTitle();
+
         mDrawerItemsViewsNames = getResources().getStringArray(R.array.drawer_items_views_names);
+        navMenuIcons = getResources().obtainTypedArray(R.array.nav_drawer_icons);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mListView = (ListView) findViewById(R.id.left_drawer);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        navDrawerItems = new ArrayList<NavDrawerItem>();
+
+        navDrawerItems.add(new NavDrawerItem(mDrawerItemsViewsNames[0], navMenuIcons.getResourceId(0, -1), true, "2"));
+        navDrawerItems.add(new NavDrawerItem(mDrawerItemsViewsNames[1], navMenuIcons.getResourceId(1, -1), true, "5"));
+        navDrawerItems.add(new NavDrawerItem(mDrawerItemsViewsNames[2], navMenuIcons.getResourceId(2, -1), true, "??"));
+
+        // Recycle the typed array
+        navMenuIcons.recycle();
+
+        mListView.setOnItemClickListener(new DrawerItemClickListener());
+
+        adapter = new NavDrawerListAdapter(getApplicationContext(),
+                navDrawerItems);
+        mListView.setAdapter(adapter);
+
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setLogo(R.drawable.ic_app_logo);
         toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
         toolbar.setSubtitle("List view");
         toolbar.setSubtitleTextColor(getResources().getColor(R.color.subtitle_color));
         toolbar.inflateMenu(R.menu.add_items_toolbar);
-        mActionBarToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name);
+
+
+        mActionBarToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name){
+            public void onDrawerClosed(View view) {
+                // calling onPrepareOptionsMenu() to show action bar icons
+                toolbar.setTitle("Example");
+                invalidateOptionsMenu();
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                toolbar.setTitle("Example2");
+                // calling onPrepareOptionsMenu() to hide action bar icons
+                invalidateOptionsMenu();
+            }
+        };
         mActionBarToggle.setDrawerIndicatorEnabled(true);
         mDrawerLayout.setDrawerListener(mActionBarToggle);
 
-        mListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1, android.R.id.text1, mDrawerItemsViewsNames));
-        mListView.setOnItemClickListener(new DrawerItemClickListener());
+//        mListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1, android.R.id.text1, mDrawerItemsViewsNames));
+
     }
 
     @Override
