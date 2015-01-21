@@ -175,8 +175,6 @@ public class NotesFragment extends ListFragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         cursor.moveToFirst();
         String str = cursor.getString(cursor.getColumnIndexOrThrow(NotesTable.CONTENT));
-        Log.e("", "!@$)(#*%&^!@(*&#^$!*(@#&$^(!@*#&$^(!#@*&$^!(*&");
-        Log.e("","@!(#*$^!&(*@^#$%)(!&@^#$(*&!@#^$(!*&#$^!(@#*&$");
         System.out.println(str);
         SimpleXmlPullApp appp = new SimpleXmlPullApp();
         try {
@@ -186,8 +184,6 @@ public class NotesFragment extends ListFragment implements LoaderManager.LoaderC
             Log.wtf("MyApp", "Something went wrong with foo!", e);
         }
 
-        Log.e("", "!@$)(#*%&^!@(*&#^$!*(@#&$^(!@*#&$^(!#@*&$^!(*&");
-        Log.e("","!@$)(#*%&^!@(*&#^$!*(@#&$^(!@*#&$^(!#@*&$^!(*&");
         mAdapter.swapCursor(cursor);
 
     }
