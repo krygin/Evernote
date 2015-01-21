@@ -2,6 +2,12 @@
 <pre-dex-items>
 
     <item
+        dex="C:\Users\Admin\Desktop\ЕВЕРНОУТ\2\Evernote\app\build\intermediates\pre-dexed\debug\classes-9568c51024ba06a55110be32e7e605aacadb74ff.jar"
+        jar="C:\Users\Admin\Desktop\ЕВЕРНОУТ\2\Evernote\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8"/>
+    <item
         dex="C:\Users\Admin\Desktop\ЕВЕРНОУТ\1\Evernote\app\build\intermediates\pre-dexed\debug\classes-3d78085b8a9fbbb0cf2bad9c478682b01628c7ec.jar"
         jar="C:\Users\Admin\Desktop\ЕВЕРНОУТ\1\Evernote\app\build\intermediates\exploded-aar\Evernote\library\unspecified\classes.jar"
         jumboMode="false"
@@ -14,8 +20,26 @@
         revision="21.1.2"
         sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8"/>
     <item
+        dex="C:\Users\Admin\Desktop\ЕВЕРНОУТ\2\Evernote\app\build\intermediates\pre-dexed\debug\internal_impl-21.0.3-b4308b67c22cc015bbe6645e0477799f826d8643.jar"
+        jar="C:\Users\Admin\Desktop\ЕВЕРНОУТ\2\Evernote\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\libs\internal_impl-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03"/>
+    <item
+        dex="C:\Users\Admin\Desktop\ЕВЕРНОУТ\2\Evernote\app\build\intermediates\pre-dexed\debug\classes-276bdb3c3a6068f3883ccda082e935a00d0e92f8.jar"
+        jar="C:\Users\Admin\Desktop\ЕВЕРНОУТ\2\Evernote\app\build\intermediates\exploded-aar\Evernote\library\unspecified\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="a516ade50426c5efca912e7a53b4e1146ca26932"/>
+    <item
         dex="C:\Users\Admin\Desktop\ЕВЕРНОУТ\1\Evernote\app\build\intermediates\pre-dexed\debug\classes-47d70f63ed5aafe992abbb07bda9b49250a21121.jar"
         jar="C:\Users\Admin\Desktop\ЕВЕРНОУТ\1\Evernote\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\21.0.3\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7"/>
+    <item
+        dex="C:\Users\Admin\Desktop\ЕВЕРНОУТ\2\Evernote\app\build\intermediates\pre-dexed\debug\classes-b162c1d4890c75d15777b2705141faae2e856c44.jar"
+        jar="C:\Users\Admin\Desktop\ЕВЕРНОУТ\2\Evernote\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\21.0.3\classes.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7"/>
@@ -31,6 +55,18 @@
         jumboMode="false"
         revision="21.1.2"
         sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03"/>
+    <item
+        dex="C:\Users\Admin\Desktop\ЕВЕРНОУТ\2\Evernote\app\build\intermediates\pre-dexed\debug\evernote-api-1.25-efbd8d8503ccd8570d8e40149ab4eec5ca3d4ef5.jar"
+        jar="C:\Users\Admin\Desktop\ЕВЕРНОУТ\2\Evernote\app\build\intermediates\exploded-aar\Evernote\library\unspecified\libs\evernote-api-1.25.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="a45a0f562b2867176a2f5f0e6c0010c9a2416e1c"/>
+    <item
+        dex="C:\Users\Admin\Desktop\ЕВЕРНОУТ\2\Evernote\app\build\intermediates\pre-dexed\debug\scribe-1.3.1-6fd23f20c73e4299a0a032b1adacc08ede2bc46d.jar"
+        jar="C:\Users\Admin\Desktop\ЕВЕРНОУТ\2\Evernote\app\build\intermediates\exploded-aar\Evernote\library\unspecified\libs\scribe-1.3.1.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="417b13630d02e4509d0ee34afcfbf281fa77f7bc"/>
     <item
         dex="C:\Users\Admin\Desktop\ЕВЕРНОУТ\1\Evernote\app\build\intermediates\pre-dexed\debug\scribe-1.3.1-9a4c52c492794d2cc93861bb290a1fc18cc73a87.jar"
         jar="C:\Users\Admin\Desktop\ЕВЕРНОУТ\1\Evernote\app\build\intermediates\exploded-aar\Evernote\library\unspecified\libs\scribe-1.3.1.jar"

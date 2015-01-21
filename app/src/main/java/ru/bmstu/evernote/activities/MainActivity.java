@@ -6,7 +6,6 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -16,13 +15,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import ru.bmstu.evernote.custom.list.view.NavDrawerItem;
+import ru.bmstu.evernote.custom.list.adapter.NavDrawerListAdapter;
 import java.util.ArrayList;
+import android.content.res.TypedArray;
+import android.util.Log;
 
 import ru.bmstu.evernote.R;
-import ru.bmstu.evernote.custom.list.adapter.NavDrawerListAdapter;
-import ru.bmstu.evernote.custom.list.view.NavDrawerItem;
 
 public class MainActivity extends ActionBarActivity {
     private static final String LOGTAG = MainActivity.class.getSimpleName();
@@ -83,12 +85,10 @@ public class MainActivity extends ActionBarActivity {
         mActionBarToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name){
             public void onDrawerClosed(View view) {
                 // calling onPrepareOptionsMenu() to show action bar icons
-                toolbar.setTitle("Example");
                 invalidateOptionsMenu();
             }
 
             public void onDrawerOpened(View drawerView) {
-                toolbar.setTitle("Example2");
                 // calling onPrepareOptionsMenu() to hide action bar icons
                 invalidateOptionsMenu();
             }
@@ -131,10 +131,10 @@ public class MainActivity extends ActionBarActivity {
         Fragment fragment = null;
         switch (position) {
             case 0:
-                fragment = new NotebooksFragment();
+                fragment = new NotesFragment();
                 break;
             case 1:
-                fragment = new NotesFragment();
+                fragment = new NotebooksFragment();
                 break;
             default:
                 break;
@@ -158,7 +158,10 @@ public class MainActivity extends ActionBarActivity {
             return true;
         switch (item.getItemId()) {
             case R.id.create_notebook:
-                new CreateNotebookDialog().show(getFragmentManager(), "Create notebook dialog");
+                Intent intent = new Intent(this, CreateNotebookActivity.class);
+//                intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, id);
+                startActivity(intent);
+//                new CreateNotebookDialog().show(getFragmentManager(), "Create notebook dialog");
                 break;
             case R.id.create_note:
                 new CreateNoteDialog().show(getFragmentManager(), "Create note dialog");
