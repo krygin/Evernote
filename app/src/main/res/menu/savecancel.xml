@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/btnNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ОТМЕНИТЬ"
+            android:background="#fff"
+            android:drawableLeft="@drawable/ic_menu_cancel"
+            android:textSize="16sp">
+        </Button>
+        <Button
+            android:id="@+id/btnYes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="СОХРАНИТЬ"
+            android:background="#fff"
+            android:layout_marginLeft="102dp"
+            android:layout_marginStart="102dp"
+            android:drawableLeft="@drawable/ic_menu_save_note"
+            android:textSize="16sp">
+        </Button>
+    </RelativeLayout>
+</menu>

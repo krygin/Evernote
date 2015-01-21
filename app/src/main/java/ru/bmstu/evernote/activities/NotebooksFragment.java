@@ -29,8 +29,8 @@ public class NotebooksFragment extends ListFragment implements LoaderManager.Loa
 
     private Object mStatusChangeListener;
 
-    private final String[] from = new String[]{Notebooks._ID, Notebooks.NAME, Notebooks.GUID, Notebooks.CREATED, Notebooks.UPDATED, Notebooks.USN, Notebooks.STATE_SYNC_REQUIRED, Notebooks.STATE_DELETED};
-    private final int[] to = new int[]{R.id.id, R.id.name, R.id.guid, R.id.created, R.id.updated, R.id.usn, R.id.sync_required, R.id.deleted };
+    private final String[] from = new String[]{Notebooks.NAME};
+    private final int[] to = new int[]{R.id.name};
 
     public NotebooksFragment() {
         // Required empty public constructor

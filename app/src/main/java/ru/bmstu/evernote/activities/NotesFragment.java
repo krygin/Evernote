@@ -45,8 +45,12 @@ public class NotesFragment extends ListFragment implements LoaderManager.LoaderC
     private CursorAdapter mAdapter;
 
 
-    private final String[] from = new String[]{Notes._ID, Notes.TITLE, Notes.CONTENT, Notes.GUID, Notes.CREATED, Notes.UPDATED, Notes.USN, Notes.NOTEBOOKS_ID};
-    private final int[] to = new int[]{R.id.id, R.id.name, R.id.content, R.id.guid, R.id.created, R.id.updated, R.id.usn, R.id.notebook_id };
+//    private final String[] from = new String[]{Notes._ID, Notes.TITLE, Notes.CONTENT, Notes.GUID, Notes.CREATED, Notes.UPDATED, Notes.USN, Notes.NOTEBOOKS_ID};
+//    private final int[] to = new int[]{R.id.id, R.id.name, R.id.content, R.id.guid, R.id.created, R.id.updated, R.id.usn, R.id.notebook_id };
+
+    private final String[] from = new String[]{Notes.TITLE, Notes.CONTENT};
+    private final int[] to = new int[]{R.id.name, R.id.content};
+
 
     public NotesFragment() {
         // Required empty public constructor
