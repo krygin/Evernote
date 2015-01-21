@@ -11,10 +11,7 @@ import android.net.Uri;
 
 import ru.bmstu.evernote.provider.database.DBHelper;
 
-import static ru.bmstu.evernote.provider.database.EvernoteContract.AUTHORITY;
-import static ru.bmstu.evernote.provider.database.EvernoteContract.Notebooks;
-import static ru.bmstu.evernote.provider.database.EvernoteContract.Notes;
-import static ru.bmstu.evernote.provider.database.EvernoteContract.Resources;
+import static ru.bmstu.evernote.provider.database.EvernoteContract.*;
 
 public class EvernoteContentProvider extends ContentProvider {
     private static final String LOGTAG = EvernoteContentProvider.class.getSimpleName();
@@ -27,8 +24,6 @@ public class EvernoteContentProvider extends ContentProvider {
     private static final int NOTEBOOKS_ID = 1;
     private static final int NOTES = 2;
     private static final int NOTES_ID = 3;
-    private static final int RESOURCES = 4;
-    private static final int RESOURCES_ID = 5;
 
     static {
         URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
@@ -37,8 +32,6 @@ public class EvernoteContentProvider extends ContentProvider {
         URI_MATCHER.addURI(AUTHORITY, Notebooks.TABLE_NAME + "/#", NOTEBOOKS_ID);
         URI_MATCHER.addURI(AUTHORITY, Notes.TABLE_NAME, NOTES);
         URI_MATCHER.addURI(AUTHORITY, Notes.TABLE_NAME + "/#", NOTES_ID);
-        URI_MATCHER.addURI(AUTHORITY, Resources.TABLE_NAME, RESOURCES);
-        URI_MATCHER.addURI(AUTHORITY, Resources.TABLE_NAME + "/#", RESOURCES_ID);
     }
 
     @Override
@@ -58,10 +51,6 @@ public class EvernoteContentProvider extends ContentProvider {
                 return Notes.CONTENT_TYPE;
             case NOTES_ID:
                 return Notes.CONTENT_ITEM_TYPE;
-            case RESOURCES:
-                return Resources.CONTENT_TYPE;
-            case RESOURCES_ID:
-                return Resources.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
@@ -71,25 +60,24 @@ public class EvernoteContentProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         Uri result;
         long id;
+        Integer notebooks = values.getAsInteger(Notebooks.STATE_SYNC_REQUIRED);
+        Integer notes = values.getAsInteger(Notes.STATE_SYNC_REQUIRED);
+        boolean syncToNetwork =
+                (notebooks != null && StateSyncRequired.values()[notebooks].equals(StateSyncRequired.PENDING)) ||
+                        (notes != null && StateSyncRequired.values()[notes].equals(StateSyncRequired.PENDING));
         final SQLiteDatabase dbConnection = helper.getWritableDatabase();
         switch (URI_MATCHER.match(uri)) {
             case NOTEBOOKS:
             case NOTEBOOKS_ID:
                 id = dbConnection.insertOrThrow(Notebooks.TABLE_NAME, null, values);
                 result = ContentUris.withAppendedId(Notebooks.CONTENT_URI, id);
-                getContext().getContentResolver().notifyChange(result, null, true);
+                getContext().getContentResolver().notifyChange(result, null, syncToNetwork);
                 break;
             case NOTES:
             case NOTES_ID:
                 id = dbConnection.insertOrThrow(Notes.TABLE_NAME, null, values);
                 result = ContentUris.withAppendedId(Notes.CONTENT_URI, id);
-                getContext().getContentResolver().notifyChange(result, null);
-                break;
-            case RESOURCES:
-            case RESOURCES_ID:
-                id = dbConnection.insertOrThrow(Resources.TABLE_NAME, null, values);
-                result = ContentUris.withAppendedId(Resources.CONTENT_URI, id);
-                getContext().getContentResolver().notifyChange(result, null);
+                getContext().getContentResolver().notifyChange(result, null, syncToNetwork);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
@@ -118,24 +106,11 @@ public class EvernoteContentProvider extends ContentProvider {
                 builder.setTables(Notes.TABLE_NAME);
                 builder.appendWhere(Notes.TABLE_NAME + "." + Notes._ID + "=" + uri.getLastPathSegment());
                 break;
-            case RESOURCES:
-                builder.setTables(Resources.TABLE_NAME);
-                break;
-            case RESOURCES_ID:
-                builder.setTables(Resources.TABLE_NAME);
-                builder.appendWhere(Resources.TABLE_NAME + "." + Resources._ID + "=" + uri.getLastPathSegment());
-                break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
         SQLiteDatabase database = helper.getReadableDatabase();
-        Cursor cursor = null;
-        try {
-            cursor = builder.query(database, projection, selection, selectionArgs, null, null, sortOrder);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        //Cursor cursor = builder.query(database, projection, selection, selectionArgs, null, null, sortOrder);
+        Cursor cursor = builder.query(database, projection, selection, selectionArgs, null, null, sortOrder);
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
@@ -143,8 +118,13 @@ public class EvernoteContentProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
-        int updated = 0;
-        Uri result = null;
+        Integer notebooks = values.getAsInteger(Notebooks.STATE_SYNC_REQUIRED);
+        Integer notes = values.getAsInteger(Notes.STATE_SYNC_REQUIRED);
+        boolean syncToNetwork =
+                (notebooks != null && StateSyncRequired.values()[notebooks].equals(StateSyncRequired.PENDING)) ||
+                        (notes != null && StateSyncRequired.values()[notes].equals(StateSyncRequired.PENDING));
+        int updated;
+        Uri result;
         long id;
         final SQLiteDatabase dbConnection = helper.getWritableDatabase();
         switch (URI_MATCHER.match(uri)) {
@@ -153,7 +133,7 @@ public class EvernoteContentProvider extends ContentProvider {
                 selection = Notebooks._ID + "=" + id;
                 updated = dbConnection.update(Notebooks.TABLE_NAME, values, selection, null);
                 result = ContentUris.withAppendedId(Notebooks.CONTENT_URI, id);
-                getContext().getContentResolver().notifyChange(result, null);
+                getContext().getContentResolver().notifyChange(result, null, syncToNetwork);
                 break;
 
             case NOTES_ID:
@@ -161,14 +141,7 @@ public class EvernoteContentProvider extends ContentProvider {
                 selection = Notes._ID + "=" + id;
                 updated = dbConnection.update(Notes.TABLE_NAME, values, selection, null);
                 result = ContentUris.withAppendedId(Notes.CONTENT_URI, id);
-                getContext().getContentResolver().notifyChange(result, null);
-                break;
-            case RESOURCES_ID:
-                id = Long.parseLong(uri.getLastPathSegment());
-                selection = Notes._ID + "=" + id;
-                updated = dbConnection.update(Resources.TABLE_NAME, values, selection, null);
-                result = ContentUris.withAppendedId(Resources.CONTENT_URI, id);
-                getContext().getContentResolver().notifyChange(result, null);
+                getContext().getContentResolver().notifyChange(result, null, syncToNetwork);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
@@ -179,25 +152,26 @@ public class EvernoteContentProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int deleted = 0;
-        ContentValues contentValues = new ContentValues();
         final SQLiteDatabase dbConnection = helper.getWritableDatabase();
         switch (URI_MATCHER.match(uri)) {
+            case NOTEBOOKS:
+                deleted = dbConnection.delete(Notebooks.TABLE_NAME, selection, selectionArgs);
+                break;
             case NOTEBOOKS_ID:
                 selection = Notebooks._ID + "=" + uri.getLastPathSegment();
                 deleted = dbConnection.delete(Notebooks.TABLE_NAME, selection, null);
+                break;
+            case NOTES:
+                deleted = dbConnection.delete(Notes.TABLE_NAME, selection, selectionArgs);
                 break;
             case NOTES_ID:
                 selection = Notes._ID + "=" + uri.getLastPathSegment();
                 deleted = dbConnection.delete(Notes.TABLE_NAME, selection, null);
                 break;
-            case RESOURCES_ID:
-                selection = Resources._ID + "=" + uri.getLastPathSegment();
-                deleted = dbConnection.delete(Resources.TABLE_NAME, selection, null);
-                break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+        getContext().getContentResolver().notifyChange(uri, null, false);
         return deleted;
     }
 }

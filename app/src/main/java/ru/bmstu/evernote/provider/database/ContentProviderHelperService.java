@@ -8,13 +8,10 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 
-import com.evernote.edam.limits.Constants;
-
 import java.util.Date;
 
 import static ru.bmstu.evernote.provider.database.EvernoteContract.Notebooks;
 import static ru.bmstu.evernote.provider.database.EvernoteContract.Notes;
-import static ru.bmstu.evernote.provider.database.EvernoteContract.Resources;
 import static ru.bmstu.evernote.provider.database.EvernoteContract.StateDeleted;
 import static ru.bmstu.evernote.provider.database.EvernoteContract.StateSyncRequired;
 
@@ -58,20 +55,8 @@ public class ContentProviderHelperService extends Service implements IClientAPI 
         contentValues.put(Notes.UPDATED, currentTime);
         contentValues.put(Notes.NOTEBOOKS_ID, notebooksId);
         contentValues.put(Notes.STATE_DELETED, StateDeleted.FALSE.ordinal());
-        contentValues.put(Resources.STATE_SYNC_REQUIRED, StateSyncRequired.PENDING.ordinal());
+        contentValues.put(Notes.STATE_SYNC_REQUIRED, StateSyncRequired.PENDING.ordinal());
         Uri result = getContentResolver().insert(Notes.CONTENT_URI, contentValues);
-        return result != null;
-    }
-
-    @Override
-    public boolean insertResource(long notesId, String filename) {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(Resources.FILENAME, filename);
-        contentValues.put(Resources.MIME_TYPE, Constants.EDAM_MIME_TYPE_DEFAULT);
-        contentValues.put(Resources.NOTES_ID, notesId);
-        contentValues.put(Resources.STATE_DELETED, StateDeleted.FALSE.ordinal());
-        contentValues.put(Resources.STATE_SYNC_REQUIRED, StateSyncRequired.PENDING.ordinal());
-        Uri result = getContentResolver().insert(Resources.CONTENT_URI, contentValues);
         return result != null;
     }
 
@@ -112,13 +97,6 @@ public class ContentProviderHelperService extends Service implements IClientAPI 
     public boolean deleteNote(long notesId) {
         Uri notesUri = ContentUris.withAppendedId(Notebooks.CONTENT_URI, notesId);
         int result = getContentResolver().delete(notesUri, null, null);
-        return result != 0;
-    }
-
-    @Override
-    public boolean deleteResource(long resourcesId) {
-        Uri resourcesUri = ContentUris.withAppendedId(Resources.CONTENT_URI, resourcesId);
-        int result = getContentResolver().delete(resourcesUri, null, null);
         return result != 0;
     }
 }
