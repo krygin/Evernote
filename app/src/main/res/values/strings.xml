@@ -43,5 +43,40 @@
     <string name="menu">Меню</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+    <string name="title_checkbox_preference">test_checkbox_preference</string>
+    <string name="summary_checkbox_preference">test_checkbox_preference_summary</string>
+    <string name="inline_preferences">test_inline_preference</string>
+    <string name="dialog_based_preferences">test_dialog_based_preference</string>
+    <string name="title_edittext_preference">test_edittext_preference</string>
+    <string name="summary_edittext_preference">test_edittext_preference_summary</string>
+    <string name="dialog_title_edittext_preference">test_edittext_preference_dialog</string>
+    <string name="launch_preferences">test_launch_preferences</string>
+    <string name="title_screen_preference">title_screen_preference</string>
+    <string name="pref_header_general">Главные настройки</string>
+    <string name="title_activity_settings">Settings</string>
 
+    <string-array name="pref_sync_period_titles">
+        <item>15 минут</item>
+        <item>30 минут</item>
+        <item>1 час</item>
+        <item>24 часа</item>
+    </string-array>
+    <string-array name="pref_sync_period_values">
+        <item>37500</item>
+        <item>75000</item>
+        <item>150000</item>
+        <item>3600000</item>
+    </string-array>
+    <string-array name="pref_layout_colors_titles">
+        <item>Зеленый</item>
+        <item>Желтый</item>
+        <item>Синий</item>
+        <item>Черный</item>
+    </string-array>
+    <string-array name="pref_layout_colors_values">
+        <item>#2dbe60</item>
+        <item>#f2f24b</item>
+        <item>#2a5bfc</item>
+        <item>#00000</item>
+    </string-array>
 </resources>

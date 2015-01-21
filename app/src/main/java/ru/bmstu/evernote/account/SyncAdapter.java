@@ -2,6 +2,8 @@ package ru.bmstu.evernote.account;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.Context;
@@ -37,6 +39,9 @@ import static ru.bmstu.evernote.provider.database.EvernoteContract.Notes;
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private DatabaseHelper databaseHelper;
     private NoteStore.Client noteStoreClient;
+    private Account account;
+    private AccountManager accountManager;
+
     public SyncAdapter(Context context) {
         super(context, true);
     }
@@ -46,30 +51,41 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle bundle, String s, ContentProviderClient contentProviderClient, SyncResult syncResult) {
 
         try {
-            databaseHelper = new DatabaseHelper(contentProviderClient);
+            this.databaseHelper = new DatabaseHelper(contentProviderClient);
             EvernoteSession evernoteSession = EvernoteSession.initInstance(getContext(), EvernoteSession.EvernoteService.SANDBOX);
-            AccountManager accountManager = AccountManager.get(getContext());
+            this.accountManager = AccountManager.get(getContext());
             String authToken = accountManager.blockingGetAuthToken(account, account.type, false);
-            noteStoreClient = evernoteSession.getClientFactory().getNoteStoreClient();
+            this.noteStoreClient = evernoteSession.getClientFactory().getNoteStoreClient();
             SyncState syncState = noteStoreClient.getSyncState(authToken);
             long updateCount = syncState.getUpdateCount();
             long fullSyncBefore = syncState.getFullSyncBefore();
+            this.account = account;
             long lastSyncTime = Long.parseLong(accountManager.getUserData(account, EvernoteAccount.EXTRA_LAST_SYNC_TIME));
             long lastUpdateCount = Long.parseLong(accountManager.getUserData(account, EvernoteAccount.EXTRA_LAST_UPDATED_COUNT));
             if (fullSyncBefore > lastSyncTime) {
-                fullSync(authToken, updateCount);
+                sync(authToken, 0, updateCount);
             } else if (updateCount == lastUpdateCount) {
                 sendChanges(authToken);
             } else {
-                incrementalSync();
+                sync(authToken, lastUpdateCount, updateCount);
             }
-        } catch (Exception e) {
+        } catch (XmlPullParserException e) {
+            syncResult.stats.numParseExceptions++;
+            e.printStackTrace();
+        } catch (RemoteException | EDAMSystemException | TException | IOException e) {
+            syncResult.stats.numIoExceptions++;
+            e.printStackTrace();
+        } catch (EDAMNotFoundException e) {
+            syncResult.stats.numConflictDetectedExceptions++;
+            e.printStackTrace();
+        } catch (EDAMUserException | AuthenticatorException | OperationCanceledException e) {
+            syncResult.stats.numAuthExceptions++;
             e.printStackTrace();
         }
     }
 
-    private void fullSync(String authToken, long updateCount) throws TException, EDAMUserException, EDAMSystemException, RemoteException, EDAMNotFoundException, XmlPullParserException, IOException {
-        int afterUSN = 0;
+    private void sync(String authToken, long lastUpdateCount, long updateCount) throws TException, EDAMUserException, EDAMSystemException, RemoteException, EDAMNotFoundException, XmlPullParserException, IOException {
+        int afterUSN = (int)lastUpdateCount;
         int maxEntries = 10;
         SyncChunkFilter filter = new SyncChunkFilter();
         filter.setIncludeNotebooks(true);
@@ -78,13 +94,24 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         SyncChunk syncChunk;
         int chunkHighUSN;
+
         do {
             syncChunk = noteStoreClient.getFilteredSyncChunk(authToken, afterUSN, maxEntries, filter);
             chunkHighUSN = syncChunk.getChunkHighUSN();
             afterUSN = chunkHighUSN;
             processSyncChunk(syncChunk, authToken);
+            storeLastUpdateCount(chunkHighUSN);
         } while (chunkHighUSN < updateCount);
         sendChanges(authToken);
+        storeLastSyncTime(syncChunk.getCurrentTime());
+    }
+
+    private void storeLastSyncTime(long currentTime) {
+        accountManager.setUserData(account, EvernoteAccount.EXTRA_LAST_SYNC_TIME, String.valueOf(currentTime));
+    }
+
+    private void storeLastUpdateCount(int chunkHighUSN) {
+        accountManager.setUserData(account, EvernoteAccount.EXTRA_LAST_UPDATED_COUNT, String.valueOf(chunkHighUSN));
     }
 
     private void processSyncChunk(SyncChunk syncChunk, String authToken) throws RemoteException, EDAMUserException, EDAMSystemException, TException, EDAMNotFoundException, XmlPullParserException, IOException {
@@ -163,11 +190,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
         }
-    }
-
-
-    private void incrementalSync() {
-
     }
 
     private void sendChanges(String authToken) throws RemoteException, EDAMUserException, EDAMSystemException, EDAMNotFoundException, TException, IOException, XmlPullParserException {

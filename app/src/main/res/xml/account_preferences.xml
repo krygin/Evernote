@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:persistent="true">
-
-    <PreferenceCategory android:title="@string/general_settings" />
-
     <PreferenceScreen
         android:key="ru.bmstu.evernote.KEY_ACCOUNT_SYNC"
-        android:summary="@string/sync_settings_summary"
-        android:title="@string/sync">
+        android:title="Настройки">
+        <intent
+            android:action="ru.bmstu.evernote.ACTION_SYNC_SETTINGS"
+            android:targetClass="ru.bmstu.evernote.activities.SettingsActivity"
+            android:targetPackage="ru.bmstu.evernote"/>
     </PreferenceScreen>
 
 </PreferenceScreen>

@@ -6,6 +6,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -15,16 +16,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import ru.bmstu.evernote.custom.list.view.NavDrawerItem;
-import ru.bmstu.evernote.custom.list.adapter.NavDrawerListAdapter;
 import java.util.ArrayList;
-import android.content.res.TypedArray;
-import android.util.Log;
 
 import ru.bmstu.evernote.R;
+import ru.bmstu.evernote.custom.list.adapter.NavDrawerListAdapter;
+import ru.bmstu.evernote.custom.list.view.NavDrawerItem;
 
 public class MainActivity extends ActionBarActivity {
     private static final String LOGTAG = MainActivity.class.getSimpleName();
@@ -105,7 +103,6 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        displayView(0);
     }
 
     @Override
