@@ -1,39 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical">
-    <EditText
-        android:id="@+id/edit_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="20dp"
-        android:inputType="text">
-    </EditText>
 
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/spinner" />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/btnYes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="@string/yes">
-        </Button>
         <Button
             android:id="@+id/btnNo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="@string/no">
+            android:text="ОТМЕНИТЬ"
+            android:background="#fefeff"
+            android:drawableLeft="@drawable/ic_menu_cancel"
+            android:textSize="16sp"
+            android:textColor="@color/backgroundLogin"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp">
         </Button>
-    </LinearLayout>
+        <Button
+            android:id="@+id/btnYes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="СОХРАНИТЬ"
+            android:background="#fefeff"
+            android:drawableLeft="@drawable/ic_menu_save_note"
+            android:textSize="16sp"
+            android:textColor="@color/backgroundLogin"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentTop="false"
+            android:layout_gravity="right">
+        </Button>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#e9e9ea"
+        android:id="@+id/view1" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="64dp"
+        android:textColor="@color/backgroundLogin"
+        android:textSize="18sp"
+        android:text="Создайте заметку"
+        android:id="@+id/simpleNote"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="20dp"
+        android:background="#fefeff"/>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#e9e9ea"
+        android:id="@+id/view2" />
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner" />
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#e9e9ea"
+        android:id="@+id/view3" />
+
+    <EditText
+        android:id="@+id/titleNote"
+        android:layout_width="fill_parent"
+        android:layout_height="64dp"
+        android:textColor="#333"
+        android:textSize="16sp"
+        android:inputType="text"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="20dp"
+        android:background="#fefeff">
+    </EditText>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#e9e9ea"
+        android:id="@+id/view4" />
+    <EditText
+        android:id="@+id/contentNote"
+        android:layout_width="fill_parent"
+        android:layout_height="64dp"
+        android:textColor="#333"
+        android:textSize="16sp"
+        android:inputType="text"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="20dp"
+        android:background="#fefeff">
+    </EditText>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#e9e9ea"
+        android:id="@+id/view5" />
 </LinearLayout>

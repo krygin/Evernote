@@ -23,7 +23,10 @@
             android:label="Детали" />
         <activity
             android:name=".activities.CreateNotebookActivity"
-            android:label="Создание" />
+            android:label="Создание блокнота" />
+        <activity
+            android:name=".activities.CreateNoteActivity"
+            android:label="Создание заметки" />
         <activity
             android:name=".activities.SplashScreen"
             android:label="@string/title_activity_splash_screen" >
