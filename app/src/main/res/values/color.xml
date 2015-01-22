@@ -7,4 +7,7 @@
     <color name="login_text">#005e37</color>
     <color name="login_hint">#1a7e4d</color>
     <color name="subtitle_color">#abe5bf</color>
+    <color name="divider">#e9e9ea</color>
+    <color name="noteFragment">#fefeff</color>
+    <color name="noteEdit">#333333</color>
 </resources>

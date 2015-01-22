@@ -25,6 +25,10 @@
     <string name="action_example">Example action</string>
     <string name="title_activity_test_database">TestDatabaseActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="btnNO">ОТМЕНИТЬ</string>
+    <string name="btnYes">СОХРАНИТЬ</string>
+    <string name="createNote">Создайте заметку</string>
+    <string name="createNotebook">Создайте простой блокнот</string>
 
 
     <string-array name="drawer_items_views_names">
