@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="evernote-api-1.25">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/library/libs/evernote-api-1.25.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -9,6 +9,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,9 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import ru.bmstu.evernote.R;
 import ru.bmstu.evernote.provider.database.EvernoteContract.Notes;
@@ -51,7 +55,6 @@ public class NotesFragment extends ListFragment implements LoaderManager.LoaderC
     private final String[] from = new String[]{Notes.TITLE, Notes.CONTENT};
     private final int[] to = new int[]{R.id.name, R.id.content};
 
-
     public NotesFragment() {
         // Required empty public constructor
     }
@@ -61,14 +64,21 @@ public class NotesFragment extends ListFragment implements LoaderManager.LoaderC
         super.onCreate(savedInstanceState);
         getLoaderManager().initLoader(0, null, this);
 
-        mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.note_item, null, from, to, 0);
 
+        mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.note_item, null, from, to, 0);
         setListAdapter(mAdapter);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.note_item, container, false);
+        TextView name = (TextView) v.findViewById(R.id.name);
+        TextView content = (TextView) v.findViewById(R.id.content);
+        Typeface regular = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Roboto-Regular.ttf");
+        Typeface slabRegular = Typeface.createFromAsset(getActivity().getAssets(), "fonts/RobotoSlab-Regular.ttf");
+        name.setTypeface(regular);
+        content.setTypeface(slabRegular);
         return inflater.inflate(R.layout.fragment_notes, null, false);
     }
 

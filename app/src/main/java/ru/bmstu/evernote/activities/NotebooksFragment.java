@@ -8,6 +8,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 import ru.bmstu.evernote.R;
 import ru.bmstu.evernote.provider.database.EvernoteContract.Notebooks;
@@ -47,6 +49,10 @@ public class NotebooksFragment extends ListFragment implements LoaderManager.Loa
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.notebook_item, container, false);
+        TextView name = (TextView) v.findViewById(R.id.name);
+        Typeface regular = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Roboto-Regular.ttf");
+        name.setTypeface(regular);
         return inflater.inflate(R.layout.fragment_notebooks, null, false);
     }
 
