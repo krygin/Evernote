@@ -63,7 +63,7 @@ public class EditNoteDialog extends DialogFragment implements View.OnClickListen
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getDialog().setTitle("Изменить заметку");
-        View v = inflater.inflate(R.layout.create_notebook_dialog, container);
+        View v = inflater.inflate(R.layout.edit_notebook_dialog, container);
         v.findViewById(R.id.btnYes).setOnClickListener(this);
         v.findViewById(R.id.btnNo).setOnClickListener(this);
         editText = (EditText) v.findViewById(R.id.edit_text);

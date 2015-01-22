@@ -22,4 +22,9 @@
     <dimen name="notePaddingTop">20dp</dimen>
     <dimen name="noteTitle">18sp</dimen>
     <dimen name="noteContent">16sp</dimen>
+    <dimen name="mDraverIconTopRigBot">12dp</dimen>
+    <dimen name="mDraverIconLeft">16dp</dimen>
+    <dimen name="mDraverEditPadRight">40dp</dimen>
+    <dimen name="mDraverEditPadLeft">5dp</dimen>
+    <dimen name="mDraverHeight">48dp</dimen>
 </resources>

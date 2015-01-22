@@ -10,7 +10,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="@color/backgroundLogin"
     tools:context="ru.bmstu.evernote.activities.SplashScreen">
-
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
@@ -18,7 +17,6 @@
         android:layout_marginTop="@dimen/logo_margin"
         android:src="@drawable/img_login_logo"
         android:contentDescription="@string/logo_content_description"/>
-
     <TextView
         android:id="@+id/under_logo"
         android:layout_width="wrap_content"

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout android:orientation="vertical" android:layout_height="match_parent" android:layout_width="wrap_content" xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditText
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:inputType="text"
+        android:layout_margin="20dp"
+        android:layout_gravity="center"
+        android:id="@+id/edit_text">
+    </EditText>
+    <LinearLayout
+        android:layout_height="wrap_content"
+        style="?android:buttonBarStyle"
+        android:layout_width="wrap_content">
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            style="?android:buttonBarButtonStyle"
+            android:layout_margin="10dp"
+            android:id="@+id/btnYes"
+            android:text="@string/yes">
+        </Button>
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            style="?android:buttonBarButtonStyle"
+            android:layout_margin="10dp"
+            android:id="@+id/btnNo"
+            android:text="@string/no">
+        </Button>
+    </LinearLayout>
+</LinearLayout>
