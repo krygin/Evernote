@@ -20,7 +20,7 @@
     <PreferenceCategory
         android:title="Другие настройки">
         <ListPreference
-            android:defaultValue="@string/green"
+            android:defaultValue="green"
             android:entries="@array/pref_layout_colors_titles"
             android:entryValues="@array/pref_layout_colors_values"
             android:key="layout_color"

@@ -34,12 +34,10 @@
     <string-array name="drawer_items_views_names">
         <item>Заметки</item>
         <item>Блокноты</item>
-        <item>TEST TRANSACTIONS</item>
     </string-array>
     <array name="nav_drawer_icons">
         <item>@drawable/ic_drawer_notes</item>
         <item>@drawable/ic_drawer_notebooks</item>
-        <item>@drawable/ic_drawer_white_notebooks</item>
     </array>
 
     <string name="desc_list_item_icon">Item Icon</string>
@@ -63,7 +61,7 @@
     <string name="green">#2dbe60</string>
     <string name="yellow">#f2f24b</string>
     <string name="blue">#2a5bfc</string>
-    <string name="black">#000000</string>
+    <string name="red">#f2452b</string>
 
     <string-array name="pref_sync_period_titles">
         <item>15 минут</item>
@@ -81,12 +79,12 @@
         <item>Зеленый</item>
         <item>Желтый</item>
         <item>Синий</item>
-        <item>Черный</item>
+        <item>Красный</item>
     </string-array>
     <string-array name="pref_layout_colors_values">
         <item>@string/green</item>
         <item>@string/yellow</item>
         <item>@string/blue</item>
-        <item>@string/black</item>
+        <item>@string/red</item>
     </string-array>
 </resources>

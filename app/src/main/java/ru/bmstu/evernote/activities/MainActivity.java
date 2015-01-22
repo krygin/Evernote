@@ -6,7 +6,10 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,16 +18,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import ru.bmstu.evernote.custom.list.view.NavDrawerItem;
-import ru.bmstu.evernote.custom.list.adapter.NavDrawerListAdapter;
 import java.util.ArrayList;
-import android.content.res.TypedArray;
-import android.util.Log;
 
 import ru.bmstu.evernote.R;
+import ru.bmstu.evernote.custom.list.adapter.NavDrawerListAdapter;
+import ru.bmstu.evernote.custom.list.view.NavDrawerItem;
 
 public class MainActivity extends ActionBarActivity {
     private static final String LOGTAG = MainActivity.class.getSimpleName();
@@ -47,6 +47,8 @@ public class MainActivity extends ActionBarActivity {
     private ArrayList<NavDrawerItem> navDrawerItems;
     private NavDrawerListAdapter adapter;
 
+    private Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,9 +62,8 @@ public class MainActivity extends ActionBarActivity {
         mListView = (ListView) findViewById(R.id.left_drawer);
         navDrawerItems = new ArrayList<NavDrawerItem>();
 
-        navDrawerItems.add(new NavDrawerItem(mDrawerItemsViewsNames[0], navMenuIcons.getResourceId(0, -1), true, "2"));
-        navDrawerItems.add(new NavDrawerItem(mDrawerItemsViewsNames[1], navMenuIcons.getResourceId(1, -1), true, "5"));
-        navDrawerItems.add(new NavDrawerItem(mDrawerItemsViewsNames[2], navMenuIcons.getResourceId(2, -1), true, "??"));
+        navDrawerItems.add(new NavDrawerItem(mDrawerItemsViewsNames[0], navMenuIcons.getResourceId(0, -1), false, "2"));
+        navDrawerItems.add(new NavDrawerItem(mDrawerItemsViewsNames[1], navMenuIcons.getResourceId(1, -1), false, "5"));
 
         // Recycle the typed array
         navMenuIcons.recycle();
@@ -73,7 +74,7 @@ public class MainActivity extends ActionBarActivity {
                 navDrawerItems);
         mListView.setAdapter(adapter);
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setLogo(R.drawable.ic_app_logo);
         toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
@@ -101,8 +102,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
+        String color = PreferenceManager.getDefaultSharedPreferences(this).getString("layout_color", "green");
+        toolbar.setBackgroundColor(Color.parseColor(color));
+        displayView(0);
     }
 
     @Override
@@ -167,6 +171,10 @@ public class MainActivity extends ActionBarActivity {
 //                intent1.putExtra(ItemDetailFragment.ARG_ITEM_ID, id);
                 startActivity(intent1);
 //                new CreateNoteDialog().show(getFragmentManager(), "Create note dialog");
+                break;
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
             default:
                 break;
         }
