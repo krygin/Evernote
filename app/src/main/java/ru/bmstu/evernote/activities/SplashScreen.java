@@ -1,19 +1,23 @@
 package ru.bmstu.evernote.activities;
 
+import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 
 import java.io.IOException;
 
 import ru.bmstu.evernote.R;
 import ru.bmstu.evernote.account.EvernoteAccount;
+import ru.bmstu.evernote.provider.database.EvernoteContract;
 
 
 public class SplashScreen extends Activity {
@@ -25,13 +29,17 @@ public class SplashScreen extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
         mContext = SplashScreen.this;
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         final AccountManager accountManager = AccountManager.get(this);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(accountManager.getAccountsByType(EvernoteAccount.TYPE).length == 0)
+                Account[] accounts = accountManager.getAccountsByType(EvernoteAccount.TYPE);
+                if(accounts.length == 0)
                     addNewAccount(accountManager);
                 else {
+                    Account account = accounts[0];
+                    ContentResolver.requestSync(account, EvernoteContract.AUTHORITY, new Bundle());
                     MainActivity.startMainActivity(mContext);
                 }
             }
@@ -44,13 +52,8 @@ public class SplashScreen extends Activity {
                     @Override
                     public void run(AccountManagerFuture<Bundle> future) {
                         try {
-                            Bundle bundle = future.getResult();
-                            //Account account = (Account)future.getResult().getParcelableArray();
-                            try {
-                                MainActivity.startMainActivity(mContext);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                            future.getResult();
+                            MainActivity.startMainActivity(mContext);
                         } catch (OperationCanceledException | IOException | AuthenticatorException e) {
                             SplashScreen.this.finish();
                         }

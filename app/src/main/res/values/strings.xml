@@ -55,6 +55,12 @@
     <string name="pref_header_general">Главные настройки</string>
     <string name="title_activity_settings">Settings</string>
 
+
+    <string name="green">#2dbe60</string>
+    <string name="yellow">#f2f24b</string>
+    <string name="blue">#2a5bfc</string>
+    <string name="black">#000000</string>
+
     <string-array name="pref_sync_period_titles">
         <item>15 минут</item>
         <item>30 минут</item>
@@ -62,10 +68,10 @@
         <item>24 часа</item>
     </string-array>
     <string-array name="pref_sync_period_values">
-        <item>37500L</item>
-        <item>75000L</item>
-        <item>150000L</item>
-        <item>3600000L</item>
+        <item>900</item>
+        <item>1800</item>
+        <item>3600</item>
+        <item>86400</item>
     </string-array>
     <string-array name="pref_layout_colors_titles">
         <item>Зеленый</item>
@@ -74,9 +80,9 @@
         <item>Черный</item>
     </string-array>
     <string-array name="pref_layout_colors_values">
-        <item>#2dbe60</item>
-        <item>#f2f24b</item>
-        <item>#2a5bfc</item>
-        <item>#00000</item>
+        <item>@string/green</item>
+        <item>@string/yellow</item>
+        <item>@string/blue</item>
+        <item>@string/black</item>
     </string-array>
 </resources>

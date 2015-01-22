@@ -4,9 +4,11 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.WebView;
@@ -21,6 +23,7 @@ import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 
 import ru.bmstu.evernote.R;
+import ru.bmstu.evernote.SettingsHelper;
 
 /**
  * Created by Ivan on 08.12.2014.
@@ -116,6 +119,16 @@ public class LoginActivity extends AccountAuthenticatorActivity {
             result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
             result.putString(AccountManager.KEY_AUTHTOKEN, token);
             accountManager.setAuthToken(account, account.type, token);
+
+            boolean sync = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("sync", false);
+            if (sync) {
+                ContentResolver.setMasterSyncAutomatically(true);
+                SettingsHelper.setSyncAutomatically(getBaseContext());
+            } else {
+                SettingsHelper.unsetPeriodicSync(getBaseContext());
+                SettingsHelper.unsetSyncAutomatically(getBaseContext());
+                ContentResolver.setMasterSyncAutomatically(false);
+            }
         } else {
             result.putString(AccountManager.KEY_ERROR_MESSAGE, "Failed to add user");
         }

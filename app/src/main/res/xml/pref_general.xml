@@ -1,28 +1,31 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="Настройки синхронизации">
+        <CheckBoxPreference
+            android:key="sync"
+            android:defaultValue="true"
+            android:summary="Автоматически синхронизировать заметки в фоновом режиме"
+            android:title="Обновлять заметки" />
 
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="sync"
-        android:summary="Автоматически синхронизировать заметки в фоновом режиме"
-        android:title="Обновлять заметки" />
-
-    <ListPreference
-        android:key="sync_period"
-        android:defaultValue="-1"
-        android:dependency="sync"
-        android:entries="@array/pref_sync_period_titles"
-        android:entryValues="@array/pref_sync_period_values"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null"
-        android:title="Частота синхронизации" />
-
-    <ListPreference
-        android:defaultValue="1"
-        android:entries="@array/pref_layout_colors_titles"
-        android:entryValues="@array/pref_layout_colors_values"
-        android:key="layout_color"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null"
-        android:title="Цвет интерфейса" />
-
+        <ListPreference
+            android:key="sync_period"
+            android:defaultValue="-1"
+            android:dependency="sync"
+            android:entries="@array/pref_sync_period_titles"
+            android:entryValues="@array/pref_sync_period_values"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="Частота синхронизации" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Другие настройки">
+        <ListPreference
+            android:defaultValue="@string/green"
+            android:entries="@array/pref_layout_colors_titles"
+            android:entryValues="@array/pref_layout_colors_values"
+            android:key="layout_color"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="Цвет интерфейса" />
+    </PreferenceCategory>
 </PreferenceScreen>

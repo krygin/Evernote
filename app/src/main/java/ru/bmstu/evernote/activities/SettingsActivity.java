@@ -1,7 +1,5 @@
 package ru.bmstu.evernote.activities;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.content.ContentResolver;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,8 +9,7 @@ import android.preference.PreferenceFragment;
 import java.util.List;
 
 import ru.bmstu.evernote.R;
-import ru.bmstu.evernote.account.EvernoteAccount;
-import ru.bmstu.evernote.provider.database.EvernoteContract;
+import ru.bmstu.evernote.SettingsHelper;
 
 public class SettingsActivity extends PreferenceActivity {
 
@@ -53,44 +50,20 @@ public class SettingsActivity extends PreferenceActivity {
 
                     if (x) {
                         ContentResolver.setMasterSyncAutomatically(true);
-                        setSyncAutomatically();
+                        SettingsHelper.setSyncAutomatically(getActivity());
                     } else {
-                        unsetPeriodicSync();
-                        unsetSyncAutomatically();
+                        SettingsHelper.unsetPeriodicSync(getActivity());
+                        SettingsHelper.unsetSyncAutomatically(getActivity());
                         ContentResolver.setMasterSyncAutomatically(false);
                     }
                     break;
                 case "sync_period":
-                    //long period = sharedPreferences.getLong(s, 0);
-                    setPeriodicSync(15);
+                    Long period = Long.parseLong(sharedPreferences.getString(s, "0"));
+                    SettingsHelper.setPeriodicSync(getActivity(),period);
                     break;
                 default:
                     break;
             }
-        }
-
-        public void setPeriodicSync(long period) {
-            AccountManager accountManager = AccountManager.get(getActivity());
-            Account account = accountManager.getAccountsByType(EvernoteAccount.TYPE)[0];
-            ContentResolver.addPeriodicSync(account, EvernoteContract.AUTHORITY, new Bundle(), period);
-        }
-
-        public void unsetPeriodicSync() {
-            AccountManager accountManager = AccountManager.get(getActivity());
-            Account account = accountManager.getAccountsByType(EvernoteAccount.TYPE)[0];
-            ContentResolver.removePeriodicSync(account, EvernoteContract.AUTHORITY, new Bundle());
-        }
-
-        public void setSyncAutomatically() {
-            AccountManager accountManager = AccountManager.get(getActivity());
-            Account account = accountManager.getAccountsByType(EvernoteAccount.TYPE)[0];
-            ContentResolver.setSyncAutomatically(account, EvernoteContract.AUTHORITY, true);
-        }
-
-        public void unsetSyncAutomatically() {
-            AccountManager accountManager = AccountManager.get(getActivity());
-            Account account = accountManager.getAccountsByType(EvernoteAccount.TYPE)[0];
-            ContentResolver.setSyncAutomatically(account, EvernoteContract.AUTHORITY, false);
         }
     }
 }
