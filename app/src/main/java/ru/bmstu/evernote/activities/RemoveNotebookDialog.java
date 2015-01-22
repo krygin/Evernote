@@ -63,7 +63,7 @@ public class RemoveNotebookDialog extends DialogFragment implements View.OnClick
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getDialog().setTitle("Удалить блокнот?");
-        View v = inflater.inflate(R.layout.create_notebook_dialog, container);
+        View v = inflater.inflate(R.layout.edit_notebook_dialog, container);
         v.findViewById(R.id.edit_text).setVisibility(View.GONE);
         v.findViewById(R.id.btnYes).setOnClickListener(this);
         v.findViewById(R.id.btnNo).setOnClickListener(this);

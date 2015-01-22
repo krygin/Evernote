@@ -13,5 +13,18 @@
     <dimen name="login_input_field_padding_bottom">18dp</dimen>
     <dimen name="login_text">18sp</dimen>
     <dimen name="navigation_drawer_width">240dp</dimen>
-
+    <dimen name="mDraver_width">320dp</dimen>
+    <dimen name="btnYesNopadding">30dp</dimen>
+    <dimen name="btnTextSize">16sp</dimen>
+    <dimen name="divider">2dp</dimen>
+    <dimen name="noteHeight">64dp</dimen>
+    <dimen name="notePadding">16dp</dimen>
+    <dimen name="notePaddingTop">20dp</dimen>
+    <dimen name="noteTitle">18sp</dimen>
+    <dimen name="noteContent">16sp</dimen>
+    <dimen name="mDraverIconTopRigBot">12dp</dimen>
+    <dimen name="mDraverIconLeft">16dp</dimen>
+    <dimen name="mDraverEditPadRight">40dp</dimen>
+    <dimen name="mDraverEditPadLeft">5dp</dimen>
+    <dimen name="mDraverHeight">48dp</dimen>
 </resources>

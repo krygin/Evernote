@@ -4,7 +4,6 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
-
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
@@ -12,101 +11,97 @@
             android:id="@+id/btnNo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ОТМЕНИТЬ"
-            android:background="#fefeff"
+            android:text="@string/btnNO"
+            android:background="@color/noteFragment"
             android:drawableLeft="@drawable/ic_menu_cancel"
-            android:textSize="16sp"
+            android:drawableStart="@drawable/ic_menu_cancel"
+            android:textSize="@dimen/btnTextSize"
             android:textColor="@color/backgroundLogin"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp">
+            android:paddingLeft="@dimen/btnYesNopadding"
+            android:paddingRight="@dimen/btnYesNopadding">
         </Button>
         <Button
             android:id="@+id/btnYes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="СОХРАНИТЬ"
-            android:background="#fefeff"
+            android:text="@string/btnYes"
+            android:background="@color/noteFragment"
             android:drawableLeft="@drawable/ic_menu_save_note"
-            android:textSize="16sp"
+            android:drawableStart="@drawable/ic_menu_cancel"
+            android:textSize="@dimen/btnTextSize"
             android:textColor="@color/backgroundLogin"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp"
+            android:paddingLeft="@dimen/btnYesNopadding"
+            android:paddingRight="@dimen/btnYesNopadding"
             android:layout_alignParentLeft="false"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="false"
             android:layout_alignParentStart="false"
             android:layout_alignParentTop="false"
-            android:layout_gravity="right">
+            android:layout_gravity="end">
         </Button>
     </RelativeLayout>
-
     <View
+        android:id="@+id/view1"
         android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="#e9e9ea"
-        android:id="@+id/view1" />
-
+        android:layout_height="@dimen/divider"
+        android:background="@color/divider" />
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="64dp"
-        android:textColor="@color/backgroundLogin"
-        android:textSize="18sp"
-        android:text="Создайте заметку"
         android:id="@+id/simpleNote"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="20dp"
-        android:background="#fefeff"/>
-
-    <View
         android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="#e9e9ea"
-        android:id="@+id/view2" />
+        android:layout_height="@dimen/noteHeight"
+        android:textColor="@color/backgroundLogin"
+        android:textSize="@dimen/noteTitle"
+        android:text="@string/createNote"
+        android:paddingLeft="@dimen/notePadding"
+        android:paddingRight="@dimen/notePadding"
+        android:paddingTop="@dimen/notePaddingTop"
+        android:background="@color/noteFragment"/>
+    <View
+        android:id="@+id/view2"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/divider"
+        android:background="@color/divider" />
     <Spinner
+        android:id="@+id/spinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/spinner" />
+        android:layout_height="wrap_content" />
     <View
+        android:id="@+id/view3"
         android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="#e9e9ea"
-        android:id="@+id/view3" />
-
+        android:layout_height="@dimen/divider"
+        android:background="@color/divider" />
     <EditText
         android:id="@+id/titleNote"
         android:layout_width="fill_parent"
-        android:layout_height="64dp"
-        android:textColor="#333"
-        android:textSize="16sp"
+        android:layout_height="@dimen/noteHeight"
+        android:textColor="@color/noteEdit"
+        android:textSize="@dimen/noteContent"
         android:inputType="text"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="20dp"
-        android:background="#fefeff">
+        android:paddingLeft="@dimen/notePadding"
+        android:paddingRight="@dimen/notePadding"
+        android:paddingTop="@dimen/notePaddingTop"
+        android:background="@color/noteFragment">
     </EditText>
-
     <View
+        android:id="@+id/view4"
         android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="#e9e9ea"
-        android:id="@+id/view4" />
+        android:layout_height="@dimen/divider"
+        android:background="@color/divider" />
     <EditText
         android:id="@+id/contentNote"
         android:layout_width="fill_parent"
-        android:layout_height="64dp"
-        android:textColor="#333"
-        android:textSize="16sp"
+        android:layout_height="@dimen/noteHeight"
+        android:textColor="@color/noteEdit"
+        android:textSize="@dimen/noteContent"
         android:inputType="text"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="20dp"
-        android:background="#fefeff">
+        android:paddingLeft="@dimen/notePadding"
+        android:paddingRight="@dimen/notePadding"
+        android:paddingTop="@dimen/notePaddingTop"
+        android:background="@color/noteFragment">
     </EditText>
-
     <View
+        android:id="@+id/view5"
         android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="#e9e9ea"
-        android:id="@+id/view5" />
+        android:layout_height="@dimen/divider"
+        android:background="@color/divider" />
 </LinearLayout>

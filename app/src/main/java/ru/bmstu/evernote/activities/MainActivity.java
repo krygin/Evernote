@@ -159,12 +159,12 @@ public class MainActivity extends ActionBarActivity {
         switch (item.getItemId()) {
             case R.id.create_notebook:
                 Intent intent = new Intent(this, CreateNotebookActivity.class);
-//                intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, id);
                 startActivity(intent);
 //                new CreateNotebookDialog().show(getFragmentManager(), "Create notebook dialog");
                 break;
             case R.id.create_note:
                 Intent intent1 = new Intent(this, CreateNoteActivity.class);
+//                intent1.putExtra(ItemDetailFragment.ARG_ITEM_ID, id);
                 startActivity(intent1);
 //                new CreateNoteDialog().show(getFragmentManager(), "Create note dialog");
             default:

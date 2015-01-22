@@ -21,7 +21,8 @@ import ru.bmstu.evernote.provider.database.IClientAPI;
 /**
  * Created by Sun on 27.12.2014.
  */
-public class EditNotebookDialog extends DialogFragment implements View.OnClickListener {
+public class
+        EditNotebookDialog extends DialogFragment implements View.OnClickListener {
 
     private IClientAPI mService = null;
     private EditText editText = null;
@@ -64,7 +65,7 @@ public class EditNotebookDialog extends DialogFragment implements View.OnClickLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getDialog().setTitle("Изменить блокнот");
-        View v = inflater.inflate(R.layout.create_notebook_dialog, container);
+        View v = inflater.inflate(R.layout.edit_notebook_dialog, container);
         v.findViewById(R.id.btnYes).setOnClickListener(this);
         v.findViewById(R.id.btnNo).setOnClickListener(this);
         editText = (EditText) v.findViewById(R.id.edit_text);
