@@ -62,10 +62,10 @@
         <item>24 часа</item>
     </string-array>
     <string-array name="pref_sync_period_values">
-        <item>37500</item>
-        <item>75000</item>
-        <item>150000</item>
-        <item>3600000</item>
+        <item>37500L</item>
+        <item>75000L</item>
+        <item>150000L</item>
+        <item>3600000L</item>
     </string-array>
     <string-array name="pref_layout_colors_titles">
         <item>Зеленый</item>
